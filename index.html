@@ -13,110 +13,357 @@
 
     <style>
         :root {
-            --bg: #020617;
-            --card: rgba(30, 41, 59, 0.4);
-            --border: rgba(255, 255, 255, 0.05);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --blue: #3b82f6;
+            /* Palette: Deep Void Black & Apple-style Greys */
+            --bg: #000000;
+            --surface: #121212;
+            --surface-hover: #1c1c1e;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 255, 255, 0.2);
+            --text-main: #f5f5f7;
+            --text-dim: #86868b;
+            --accent: #2997ff; /* Apple Blue */
+            --ease: cubic-bezier(0.32, 0.72, 0, 1);
         }
 
-        /* Use the System Font Stack for instant "Native" feel */
         body {
             margin: 0;
-            background: var(--bg);
+            background-color: var(--bg);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.5;
+            /* System fonts with tight tracking for that "editorial" look */
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* Ambient background without images */
-        .mesh {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
-                        radial-gradient(circle at 85% 30%, rgba(192, 132, 252, 0.08), transparent 25%);
+        /* Ambient Lighting - Subtler, larger, moving slowly */
+        .ambient-light {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(41, 151, 255, 0.08), transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(100, 100, 255, 0.05), transparent 40%);
+            z-index: -1;
+            animation: pulse 10s ease-in-out infinite alternate;
+            pointer-events: none;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-        
-        header { padding: 48px 0; display: flex; justify-content: space-between; align-items: center; }
-        .logo-box { width: 32px; height: 32px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--bg); font-weight: 800; }
-
-        .hero { padding: 80px 0; }
-        .hero h1 { font-size: clamp(3rem, 8vw, 5rem); font-weight: 800; letter-spacing: -0.05em; margin: 0 0 24px 0; line-height: 1; 
-                   background: linear-gradient(to right, #fff, var(--text-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { font-size: 1.25rem; color: var(--text-dim); max-width: 600px; margin: 0; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; padding-bottom: 100px; }
-        
-        .card { 
-            text-decoration: none; color: inherit; position: relative; overflow: hidden;
-            background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 24px; padding: 32px;
-            transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1), border 0.4s;
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
         }
-        .card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.2); }
-        
-        .card-icon { width: 64px; height: 64px; border-radius: 16px; margin-bottom: 24px; border: 1px solid var(--border); }
-        .card h3 { font-size: 1.5rem; margin: 0 0 8px 0; }
-        .card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 32px; flex-grow: 1; }
-        
-        .badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        footer { border-top: 1px solid var(--border); padding: 48px 0; color: var(--text-dim); font-size: 14px; }
+        .container {
+            max-width: 980px; /* Apple uses narrower containers for readability */
+            margin: 0 auto;
+            padding: 0 24px;
+        }
 
-        /* Modal Logic */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
+        /* Header: Minimal & Blended */
+        header {
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            /* Fade mask at bottom of header */
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box {
+            width: 20px;
+            height: 20px;
+            background: var(--text-main);
+            color: var(--bg);
+            border-radius: 4px;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* Hero: Massive, Centered, Clean */
+        .hero {
+            padding: 120px 0 100px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 5.5rem);
+            font-weight: 600; /* Apple prefers 600 over 800 these days */
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin: 0 auto 24px;
+            max-width: 800px;
+            background: linear-gradient(180deg, #fff 0%, #a1a1a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Balanced text wrapping */
+            text-wrap: balance;
+        }
+
+        .hero p {
+            font-size: 1.5rem; /* Larger introduction text */
+            color: var(--text-dim);
+            line-height: 1.4;
+            max-width: 580px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Grid: The "Bento" Box Look */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+            padding-bottom: 120px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px; /* Smooth curvature */
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s var(--ease);
+            display: flex;
+            flex-direction: column;
+            
+            /* The Glass Effect */
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+        }
+
+        /* Inner glow highlights */
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            background: var(--surface-hover);
+            transform: translateY(-4px) scale(1.01);
+            border-color: var(--border-highlight);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: #000;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            object-fit: cover;
+        }
+
+        .card-content h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .card-content p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            margin: 0 0 24px 0;
+            line-height: 1.6;
+        }
+
+        .cta-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 12px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 0;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-link {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .footer-link:hover { color: var(--text-main); }
+
+        /* Modal: More minimal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s var(--ease);
+        }
         .modal.open { display: flex; opacity: 1; }
-        .modal-content { background: #0f172a; border: 1px solid var(--border); padding: 40px; border-radius: 32px; max-width: 500px; width: 90%; position: relative; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; cursor: pointer; font-size: 20px; }
+
+        .modal-content {
+            background: #1c1c1e;
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 440px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s var(--ease);
+        }
+        .modal.open .modal-content { transform: scale(1); }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 30px; 
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: grid; 
+            place-items: center;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
-    <div class="mesh"></div>
+
+    <div class="ambient-light"></div>
+
     <div class="container">
         <header>
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="logo-box">B</div>
-                <span style="font-weight:700; font-size:20px;">BauerHaus</span>
+            <div class="nav-content">
+                <div class="logo">
+                    <div class="logo-box">B</div>
+                    <span>BauerHaus</span>
+                </div>
             </div>
         </header>
 
         <main>
             <section class="hero">
-                <h1>Software for the<br>Modern Mac.</h1>
-                <p>Native, high-performance macOS utilities that feel like they belong. No Electron. Just Swift.</p>
+                <h1 style="opacity:0; animation: fadeUp 0.8s var(--ease) forwards;">
+                    Software for the<br>Modern Mac.
+                </h1>
+                <p style="opacity:0; animation: fadeUp 0.8s var(--ease) 0.1s forwards;">
+                    Native utilities. Zero Electron. Pure Swift.
+                </p>
             </section>
 
             <section class="grid">
-                <a href="WindowSmith/" class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:start;">
-                        <img src="assets/icon.png" class="card-icon" alt="Icon">
-                        <span class="badge">Released</span>
+                <a href="WindowSmith/" class="card" style="opacity:0; animation: fadeUp 0.8s var(--ease) 0.2s forwards;">
+                    <div class="card-top">
+                        <img src="assets/icon.png" class="card-icon" alt="App Icon">
+                        <span class="badge" style="background: rgba(41, 151, 255, 0.15); color: #2997ff; border-color: rgba(41, 151, 255, 0.3);">
+                            Available Now
+                        </span>
                     </div>
-                    <h3>WindowSmith</h3>
-                    <p>End the window clutter. Arrange your screen instantly with visual snap layouts designed for your workflow.</p>
-                    <div style="font-weight:600; display:flex; align-items:center; gap:8px;">
-                        View Project <span>→</span>
+                    <div class="card-content">
+                        <h3>WindowSmith</h3>
+                        <p>End the window clutter. Arrange your screen instantly with visual snap layouts designed for your workflow.</p>
+                        <div class="cta-link">
+                            View Project <span>→</span>
+                        </div>
                     </div>
                 </a>
 
-                <div class="card" style="opacity: 0.5;">
-                    <div class="card-icon" style="background: rgba(255,255,255,0.05);"></div>
-                    <h3>Project Two</h3>
-                    <p>A new productivity tool currently in development. Stay tuned.</p>
-                    <span class="badge" style="background:rgba(255,255,255,0.05); color:#999; border:none;">Soon</span>
+                <div class="card" style="opacity:0; animation: fadeUp 0.8s var(--ease) 0.3s forwards; filter: grayscale(1); cursor: default;">
+                    <div class="card-top">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #333, #222);"></div>
+                        <span class="badge">In Development</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Project Two</h3>
+                        <p>A new productivity tool is currently in the works. Stay tuned for updates later this year.</p>
+                        <div class="cta-link" style="color: var(--text-dim);">
+                            Coming Soon
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
 
         <footer>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <p>© 2026 BauerHaus. All rights reserved.</p>
-                <div style="display:flex; gap:24px;">
-                    <button onclick="toggleModal('privacy')" style="background:none; border:none; color:inherit; cursor:pointer;">Privacy</button>
-                </div>
+            <div class="footer-content">
+                <p>© 2026 BauerHaus. Made in Minnesota.</p>
+                <button class="footer-link" onclick="toggleModal('privacy')">Privacy Commitment</button>
             </div>
         </footer>
     </div>
@@ -124,15 +371,37 @@
     <div id="privacy" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleModal('privacy')">×</button>
-            <h2 style="margin-top:0">Privacy Commitment</h2>
-            <p style="color:var(--text-dim)">We believe your data belongs to you. Period. Our apps work 100% locally with zero tracking or analytics.</p>
+            <h2 style="margin-top:0; font-size: 1.5rem; letter-spacing: -0.02em;">Your Data is Yours.</h2>
+            <p style="color:var(--text-dim); line-height: 1.6;">
+                We believe software should serve you, not track you. Our apps work 100% locally on your machine. No analytics, no telemetry, no cloud requirement.
+            </p>
         </div>
     </div>
 
     <script>
         function toggleModal(id) {
-            document.getElementById(id).classList.toggle('open');
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('open')) {
+                modal.classList.remove('open');
+            } else {
+                modal.classList.add('open');
+            }
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('privacy');
+            if (event.target == modal) {
+                modal.classList.remove('open');
+            }
         }
     </script>
+
+    <style>
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>
