@@ -7,9 +7,9 @@ graph TD
     classDef target fill:#1a1a2e,stroke:#e94560,stroke-width:3px,color:#fff,rx:10px,ry:10px;
 
     subgraph UI ["User Interface (SwiftUI & AppKit)"]
-        MB["Menu Bar Status Item"]
-        PO["Glass Hosting Controller <br/> Popover Manager"]
-        SW["Settings Window Manager"]
+        MB["NSStatusItem <br/> Menu Bar Icon"]
+        PO["GlassHostingController <br/> Popover Manager"]
+        SW["SettingsWindowManager"]
         
         subgraph Views ["SwiftUI View Layer"]
             MenuBarView["MenuBarView"]
@@ -26,51 +26,55 @@ graph TD
     end
 
     subgraph Core ["Core Engine (Swift)"]
-        WC["WindowController <br/> Singleton Orchestrator"]
-        GKM["GlobalKeyMonitor <br/> NSEvent Tracker"]
+        WC["WindowController <br/> (Singleton / ObservableObject)"]
+        GKM["GlobalKeyMonitor"]
         
-        subgraph Logic ["Business & State Logic"]
-            Layout["Layout Presets & Math Engine"]
-            State["State & Permissions Manager"]
-            Pulse["Pulse Animation Timer"]
+        subgraph WC_Logic ["WindowController Internal Logic"]
+            Layout["Geometry & Math Engine <br/> (Relative/Grid Sizing)"]
+            Pulse["Pulse Timer <br/> (Visual Feedback)"]
         end
         
-        UD[("UserDefaults / JSON Encoder")]
+        UD[("UserDefaults <br/> (Preferences & Presets)")]
     end
 
     subgraph MacOS ["macOS System APIs"]
-        AX["Accessibility API <br/> AXUIElement"]
-        WS["NSWorkspace <br/> Active App Tracker"]
-        CG["CoreGraphics & NSScreen <br/> Screen Bounds & Geometry"]
-        GCD["Grand Central Dispatch <br/> userInteractive Queue"]
+        AX["Accessibility API (AXUIElement)"]
+        WS["NSWorkspace <br/> (Active App Tracking)"]
+        CG["CoreGraphics & NSScreen <br/> (Screen Bounds)"]
+        GCD["Grand Central Dispatch <br/> (userInteractive Queue)"]
+        SM["SMAppService <br/> (Launch at Login)"]
     end
 
     subgraph Target ["Target Environment"]
-        TA["Third-Party OS Window <br/> e.g., Safari, Xcode, Figma"]
+        TA["Third-Party OS Window <br/> (Safari, Xcode, etc.)"]
     end
 
-    %% Core Connections
-    MenuBarView -->|Trigger Snap Command| WC
-    Grid -->|Save Custom Grid| State
-    State <-->|Persist/Load Presets| UD
+    %% UI to Core Connections
+    MenuBarView -->|Triggers Snap / Layout| WC
+    SettingsView -->|Saves Settings & Custom Grids| WC
+    WC <-->|Combine @Published Updates| Views
+    WC <-->|Persists/Loads Data| UD
+    WC -->|Toggles| SM
     
-    GKM == "Intercepts Ctrl+Opt" ==> WC
-    WC -->|Calculates Relative Rect| Layout
-    WC -->|Triggers Icon Feedback| Pulse
+    %% Core Internals
+    GKM == "Intercepts Ctrl+Opt+Keys" ==> WC
+    WC --> Layout
+    WC --> Pulse
+    Pulse -.->|Dims/Restores Opacity| MB
     
-    %% OS API Connections
-    WC -->|Query Frontmost PID| WS
-    WC -->|Query Target Screen Bounds| CG
+    %% Core to OS API Connections
+    WC -->|Queries Frontmost PID| WS
+    WC -->|Queries Visible Frames| CG
     
-    Layout == "Dispatches Resizing Task" ==> GCD
-    GCD == "Async Coordinate Injection <br/> (w/ usleep buffer)" ==> AX
+    Layout == "Dispatches Async Resize/Move Task" ==> GCD
+    GCD == "Injects Coordinates (w/ usleep buffer)" ==> AX
     
     %% Execution
-    AX == "Translates & Resizes Frame" ==> TA
+    AX == "Translates & Modifies Frame" ==> TA
 
     %% Assign Classes
     class MB,PO,SW,MenuBarView,SettingsView,Grid,Snap ui;
-    class WC,GKM,Layout,State,Pulse,UD core;
-    class AX,WS,CG,GCD sys;
+    class WC,GKM,Layout,Pulse,UD,WC_Logic core;
+    class AX,WS,CG,GCD,SM sys;
     class TA target;
 ```
