@@ -4,52 +4,55 @@ WindowSmith
 <i>Precision window management for the modern macOS workspace.</i>
 </p>
 
-🚀 The "Elevator Pitch"
 
-The Problem: macOS is a beautiful operating system, but its native window management leaves power users dragging, dropping, and manually resizing windows across massive ultra-wide monitors or multi-display setups. This causes friction, breaks focus, and wastes time.
+Overview
 
-The Solution: WindowSmith is a lightning-fast, keyboard-driven window manager and layout tool built natively for macOS. Designed for developers, designers, and multitaskers, it allows users to instantly snap windows into precise grid layouts (Halves, Thirds, Quadrants, or Custom Grids), "throw" windows across multiple displays, and define absolute pixel-perfect sizing.
+The Challenge: macOS offers a refined operating system, but its native window management often requires manual resizing and positioning. This can disrupt workflow and create friction, particularly for power users operating across multi-display or ultra-wide monitor setups.
 
-It lives quietly in your menu bar, stays out of your way, and activates instantly via customizable global hotkeys. Whether you need a rigid 25/50/25 "Focus" layout for coding or a complex custom grid, WindowSmith bends the macOS desktop to your will.
+The Solution: WindowSmith is a highly optimized, keyboard-driven window manager and layout utility built natively for macOS. Designed for developers, designers, and multitaskers, it enables instant window snapping into precise grid layouts (Halves, Thirds, Quadrants, or Custom Grids), seamless cross-display window routing, and exact pixel-perfect sizing.
 
-🛠 The Tech Stack
+Operating discreetly from the menu bar, WindowSmith is activated instantly via customizable global hotkeys. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
+
+Technical Stack
 
 WindowSmith is built from the ground up to be lightweight, performant, and deeply integrated into the macOS ecosystem.
 
 Language: Swift 5+
 
-UI Frameworks: * SwiftUI: Utilized for modern, reactive, and fluid interfaces in the Menu Bar popover and Settings windows.
+UI Frameworks:
 
-AppKit: Handled low-level window lifecycle management, NSPopover interactions, and global event monitoring.
+SwiftUI: Leveraged for modern, reactive, and fluid interfaces within the Menu Bar popover and Settings modules.
+
+AppKit: Manages low-level window lifecycle events, NSPopover interactions, and global event monitoring.
 
 Core APIs & Frameworks:
 
-ApplicationServices (Accessibility API): The C-based AXUIElement framework powers the core engine, allowing WindowSmith to read and manipulate third-party application windows with zero latency.
+ApplicationServices (Accessibility API): The C-based AXUIElement framework powers the core engine, enabling zero-latency reading and manipulation of third-party application windows.
 
-CoreGraphics: For handling complex multi-monitor bounds, frame calculations, and coordinate geometry.
+CoreGraphics: Utilized for processing complex multi-monitor bounds, frame calculations, and coordinate geometry.
 
-ServiceManagement: For seamless "Launch at Login" functionality.
+ServiceManagement: Ensures seamless "Launch at Login" functionality.
 
-Combine: For reactive state management across the application lifecycle.
+Combine: Facilitates reactive state management across the application lifecycle.
 
-🧠 Challenges & Solutions
+Engineering Challenges & Solutions
 
-Building a native macOS window manager requires interacting with deeply embedded, legacy Apple frameworks. Here is a look at one of the core technical hurdles overcome during development:
+Building a native macOS window manager requires interacting with deeply embedded, legacy Apple frameworks. Below is an overview of a core technical hurdle overcome during development:
 
-Challenge: The Dual-Coordinate System & Multi-Monitor Math
+Challenge: Dual-Coordinate Systems & Multi-Monitor Geometry
 
-Moving a window on macOS isn't as simple as setting an (x, y) coordinate. AppKit uses a bottom-left origin coordinate system (where y=0 is the bottom of the screen), while the macOS Accessibility API (AXUIElement) requires a top-left origin system.
+Window manipulation on macOS requires navigating disparate coordinate systems. AppKit utilizes a bottom-left origin coordinate system (where y=0 represents the bottom of the display), whereas the macOS Accessibility API (AXUIElement) relies on a top-left origin system.
 
-When a user triggers a hotkey to "Throw" a window from a 14-inch MacBook Pro screen to a 32-inch 4K external monitor, calculating the exact relative geometry requires translating coordinates between these two inverted systems, factoring in the different resolutions, and accounting for the physical arrangement of the displays in System Settings (which dictates the global coordinate space).
+When executing a command to move a window from a primary display to an external monitor of differing resolution, calculating the precise relative geometry requires translating coordinates between these inverted systems, factoring in varied pixel densities, and accounting for the physical arrangement of displays in System Settings (which dictates the global coordinate space).
 
 The Solution
 
-Instead of relying on slow AppleScript bridges, I built a custom, low-level geometry engine using CoreGraphics and the C-based Accessibility API.
+To bypass the latency of standard AppleScript bridges, WindowSmith implements a custom, low-level geometry engine utilizing CoreGraphics and the C-based Accessibility API.
 
-Coordinate Normalization: The engine dynamically queries NSScreen.screens to map the global desktop space. It captures the target window's frame, translates the bottom-left AppKit bounds to a normalized 0.0 to 1.0 relative floating-point ratio, and projects that ratio onto the target monitor's visibleFrame.
+Coordinate Normalization: The engine dynamically queries NSScreen.screens to map the global desktop space. It captures the target window's frame, translates the bottom-left AppKit bounds into a normalized 0.0 to 1.0 relative floating-point ratio, and projects that ratio onto the target monitor's visibleFrame.
 
-Inversion & Injection: Before injecting the new coordinates via AXUIElementSetAttributeValue, the engine intercepts the height of the primary screen and mathematically inverts the Y-axis.
+Inversion & Injection: Prior to injecting the new coordinates via AXUIElementSetAttributeValue, the engine intercepts the height of the primary screen and mathematically inverts the Y-axis.
 
-Concurrency: To prevent the visual "stuttering" or "rubber-banding" that plagues many window managers when resizing heavy apps (like Chrome or Xcode), the sizing and positioning commands are dispatched asynchronously on a background userInteractive queue, utilizing a micro-sleep (usleep) buffer to allow the third-party app's internal UI thread to catch up before applying the final coordinate snap.
+Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associated with resizing heavy applications (e.g., Xcode or web browsers), sizing and positioning commands are dispatched asynchronously on a background userInteractive queue. This utilizes a micro-sleep (usleep) buffer, allowing the target application's internal UI thread to synchronize before applying the final coordinate snap.
 
-The result is a window manipulation engine that feels instantaneous, regardless of the app being moved or the complexity of the monitor setup.
+Result: A window manipulation engine that executes instantaneously and reliably, regardless of the target application or the complexity of the user's monitor configuration.
