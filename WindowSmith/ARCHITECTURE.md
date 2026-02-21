@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     %% Define Styles
     classDef ui fill:#0f4c75,stroke:#3282b8,stroke-width:2px,color:#fff,rx:5px,ry:5px;
@@ -72,3 +73,4 @@ graph TD
     class WC,GKM,Layout,State,Pulse,UD core;
     class AX,WS,CG,GCD sys;
     class TA target;
+```
