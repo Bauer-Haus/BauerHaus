@@ -1,0 +1,2 @@
+User-agent: *
+Disallow: /v-99-xc2/
