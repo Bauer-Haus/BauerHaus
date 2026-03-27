@@ -40,7 +40,7 @@
                 
                 let playerHtml = '';
                 if (cam.type === "youtube") {
-                    playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?autoplay=1&mute=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+                    playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?mute=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     playerHtml = `<video id="cam${index}" class="video-js vjs-default-skin" controls autoplay preload="auto"><source src="${cam.url}" type="application/x-mpegURL"></video>`;
                 }
