@@ -31,16 +31,23 @@
 
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     <script>
-        // Use a simple prompt for the "If you know, you know" vibe
-        const accessCode = prompt("Enter Credentials:");
-        
-        if (accessCode === "LiveCam") { // <--- CHANGE YOUR PASSWORD HERE
-            document.getElementById('gatekeeper').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-        } else {
-            alert("Unauthorized Access.");
+    // 1. Get the input
+    const input = prompt("Enter Credentials:");
+    
+    // 2. Clean the input: .trim() removes spaces, .toLowerCase() ignores Caps
+    const accessCode = input ? input.trim().toLowerCase() : "";
+
+    // 3. Check against your secret word (must be lowercase here)
+    if (accessCode === "LiveCam") { 
+        document.getElementById('gatekeeper').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+    } else {
+        alert("Unauthorized Access.");
+        // Only redirect if they actually typed something wrong (not just hitting cancel)
+        if (input !== null) {
             window.location.href = "https://bauer-haus.github.io/BauerHaus/";
         }
-    </script>
+    }
+</script>
 </body>
 </html>
