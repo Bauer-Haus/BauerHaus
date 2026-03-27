@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Status</title>
+    <title>Live Cams</title>
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <style>
         body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -55,7 +55,7 @@
 
         // --- 3. THE GATEKEEPER ---
         (function() {
-            const input = prompt("Enter Credentials:");
+            const input = prompt("Enter Password:");
             const accessCode = input ? input.trim().toLowerCase() : "";
 
             if (accessCode === "livecam") {
