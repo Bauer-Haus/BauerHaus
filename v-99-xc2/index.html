@@ -1,26 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>404 Not Found</title> <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status</title> <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <style>
-        body { background: black; color: #1a1a1a; font-family: sans-serif; text-align: center; padding-top: 20%; }
-        #player-wrapper { display: none; } /* Hidden by default */
+        body { background-color: #0a0a0a; color: #444; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #gatekeeper { margin-top: 100px; text-align: center; }
+        #main-content { display: none; width: 100%; max-width: 900px; }
+        .cam-container { margin-bottom: 30px; border: 1px solid #222; padding: 10px; background: #111; }
+        h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #666; }
     </style>
 </head>
 <body>
-    <div id="player-wrapper">
-        <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
-            <source src="YOUR_M3U8_LINK_HERE" type="application/x-mpegURL">
-        </video>
+
+    <div id="gatekeeper">
+        <p>SECURE ACCESS REQUIRED</p>
+    </div>
+
+    <div id="main-content">
+        <div class="cam-container">
+            <h2>Live Feed 01 - Primary</h2>
+            <video id="cam1" class="video-js vjs-default-skin vjs-16-9" controls autoplay preload="auto">
+                <source src="https://s65.ipcamlive.com/streams/41cl5jquvyvinuxmo/stream.m3u8" type="application/x-mpegURL">
+            </video>
+        </div>
+
+        <div id="extra-cams"></div>
     </div>
 
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     <script>
-        var pass = prompt("Enter Access Key:");
-        if (pass === "LiveCam") { // Change this to your secret code
-            document.getElementById('player-wrapper').style.display = 'block';
+        // Use a simple prompt for the "If you know, you know" vibe
+        const accessCode = prompt("Enter Credentials:");
+        
+        if (accessCode === "LiveCam") { // <--- CHANGE YOUR PASSWORD HERE
+            document.getElementById('gatekeeper').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
         } else {
-            window.location.href = "https://github.com/Bauer-Haus/BauerHaus"; // Boot them out
+            alert("Unauthorized Access.");
+            window.location.href = "https://bauer-haus.github.io/BauerHaus/";
         }
     </script>
 </body>
