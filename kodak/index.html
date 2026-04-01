@@ -25,33 +25,38 @@
         // --- 1. YOUR CAMERA LIST ---
         // Just add a new line here to add a camera!
         const myCameras = [
-            { title: "Newport Beach Pier", type: "hls", url: "https://s65.ipcamlive.com/streams/41cl5jquvyvinuxmo/stream.m3u8" },
+            { title: "Blackie's Bar Surf Cam", type: "iframe", url: "https://ipcamlive.com/player/player.php?alias=41ytwjxs7tudiqvl5&autoplay=1" },
             { title: "Big Sky", type: "youtube", url: "dMr-Jt_K3Cc" },
             { title: "Key West", type: "hls", url: "https://usw01-smr05-relay.ozolio.com/hls-live/_definst_/relay01.jflbdqs.fd0.sm1.av2.mt0.at0.as0.dv0.sh2.rt19793.rc0.edge.basic.stream/chunklist_w1943403610.m3u8" }
         ];
 
-        // --- 2. THE ENGINE (Don't change this) ---
-        function loadDashboard() {
-            const container = document.getElementById('main-content');
-            
-            myCameras.forEach((cam, index) => {
-                const camDiv = document.createElement('div');
-                camDiv.className = 'cam-container';
-                
-                let playerHtml = '';
-                if (cam.type === "youtube") {
-                    playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?mute=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-                } else {
-                    playerHtml = `<video id="cam${index}" class="video-js vjs-default-skin" controls autoplay preload="auto"><source src="${cam.url}" type="application/x-mpegURL"></video>`;
-                }
-
-                camDiv.innerHTML = `<h2>Live Feed ${index + 1} - ${cam.title}</h2>${playerHtml}`;
-                container.appendChild(camDiv);
-            });
-
-            document.getElementById('gatekeeper').style.display = 'none';
-            container.style.display = 'grid';
+        // --- 2. THE ENGINE ---
+function loadDashboard() {
+    const container = document.getElementById('main-content');
+    
+    myCameras.forEach((cam, index) => {
+        const camDiv = document.createElement('div');
+        camDiv.className = 'cam-container';
+        
+        let playerHtml = '';
+        if (cam.type === "youtube") {
+            // YouTube Engine
+            playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?mute=1" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (cam.type === "iframe") {
+            // NEW: Generic Embed Engine (for IPCamLive, CamStreamer, etc.)
+            playerHtml = `<iframe src="${cam.url}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        } else {
+            // HLS Video.js Engine
+            playerHtml = `<video id="cam${index}" class="video-js vjs-default-skin" controls preload="auto"><source src="${cam.url}" type="application/x-mpegURL"></video>`;
         }
+
+        camDiv.innerHTML = `<h2>Live Feed ${index + 1} - ${cam.title}</h2>${playerHtml}`;
+        container.appendChild(camDiv);
+    });
+
+    document.getElementById('gatekeeper').style.display = 'none';
+    container.style.display = 'grid';
+}
 
         // --- 3. THE GATEKEEPER ---
         (function() {
