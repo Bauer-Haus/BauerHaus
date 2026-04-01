@@ -40,10 +40,8 @@ function loadDashboard() {
         
         let playerHtml = '';
         if (cam.type === "youtube") {
-            // YouTube Engine
             playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?mute=1" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
         } else if (cam.type === "iframe") {
-            // NEW: Generic Embed Engine (for IPCamLive, CamStreamer, etc.)
             playerHtml = `<iframe src="${cam.url}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         } else {
             // HLS Video.js Engine
@@ -52,12 +50,16 @@ function loadDashboard() {
 
         camDiv.innerHTML = `<h2>Live Feed ${index + 1} - ${cam.title}</h2>${playerHtml}`;
         container.appendChild(camDiv);
+
+        // --- ADD THIS TO WAKE UP VIDEO.JS ---
+        if (cam.type === "hls") {
+            videojs(`cam${index}`); 
+        }
     });
 
     document.getElementById('gatekeeper').style.display = 'none';
     container.style.display = 'grid';
 }
-
         // --- 3. THE GATEKEEPER ---
         (function() {
             const input = prompt("Enter Password:");
