@@ -107,16 +107,9 @@
             border-radius: 50%;
         }
 
-        /* FIX: These Tailwind-style utilities are referenced in markup but are not
-           built-in classes — perspective-1000 and rotate-x-6 must be defined here. */
         .perspective-1000 { perspective: 1000px; }
         .rotate-x-6 { transform: rotateX(6deg); }
 
-        /* FIX: Snap popup — hidden by default, revealed on hover of the icon button.
-           Using plain CSS here because the Tailwind group/name variant requires
-           the group and group-hover classes to be on the same element chain, but
-           overflow:hidden on ancestor containers can interfere with Tailwind's
-           group-hover scoping at the CDN build level. */
         .snap-popup {
             display: none;
         }
@@ -125,11 +118,35 @@
             display: block;
         }
 
-        /* FIX: The mock screen's overflow:hidden was clipping the popup.
-           Allow the menubar strip to overflow so the dropdown can escape. */
         .mock-menubar {
             overflow: visible;
         }
+
+        /* Modal System (Consistent with main site) */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+            display: none; align-items: center; justify-content: center; 
+            z-index: 100; opacity: 0; transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .modal.open { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background: #1c1c1e; border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 40px; border-radius: 24px; max-width: 440px; width: 90%; 
+            position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5); 
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+        .modal.open .modal-content { transform: scale(1); }
+        
+        .close-btn {
+            position: absolute; top: 20px; right: 20px; 
+            background: rgba(255,255,255,0.1); border: none; color: #fff; 
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer; 
+            display: grid; place-items: center; transition: background 0.2s;
+        }
+        .close-btn:hover { background: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-500/30 selection:text-blue-200">
@@ -195,13 +212,8 @@
                 
                 <div class="relative rounded-xl border border-white/10 bg-[#1e293b]/60 backdrop-blur-xl shadow-2xl p-1 md:p-2 transform transition-all duration-700 hover:scale-[1.01] hover:rotate-x-0 rotate-x-6">
                     
-                    <!-- FIX: Removed overflow-hidden from this container so the snap popup
-                         is not clipped. Rounded corners on inner content are preserved by
-                         the rounded-lg class on the inner bg div below. -->
                     <div class="bg-[#0f172a] rounded-lg relative h-[400px] md:h-[500px] w-full border border-white/5">
                         
-                        <!-- FIX: Added mock-menubar class (overflow:visible) so the absolute-
-                             positioned dropdown can render outside the h-9 strip's bounds. -->
                         <div class="mock-menubar absolute top-0 left-0 right-0 h-9 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between z-20 backdrop-blur-md rounded-t-lg">
                             <div class="flex gap-4 text-[11px] font-semibold text-white">
                                 <span class="opacity-90"></span>
@@ -211,14 +223,9 @@
                                 <span class="opacity-60 font-normal">Window</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <!-- FIX: Added snap-btn class to trigger popup on hover.
-                                     Previously the popup had no visibility toggle at all —
-                                     it was always rendered and always visible. -->
                                 <div class="snap-btn w-6 h-6 rounded bg-blue-500 text-white flex items-center justify-center relative cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.6)]">
                                     <i class="ph-bold ph-layout"></i>
                                     
-                                    <!-- FIX: snap-popup class hides this by default;
-                                         it appears on hover via .snap-btn:hover .snap-popup. -->
                                     <div class="snap-popup absolute top-full right-0 mt-4 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl p-5 z-50 text-left">
                                         <div class="absolute -top-1.5 right-2 w-3 h-3 bg-[#1e293b] border-t border-l border-white/10 rotate-45"></div>
                                         
@@ -259,10 +266,8 @@
                         <div class="absolute inset-0 top-9 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex items-center justify-center overflow-hidden rounded-b-lg">
                             <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 30px 30px;"></div>
 
-                            <!-- Centered flex layout: left wide window + right stacked pair -->
                             <div class="relative flex gap-4 w-full h-full p-5 items-stretch justify-center">
 
-                                <!-- Left: code window -->
                                 <div class="w-[54%] bg-[#1e293b] rounded-lg border border-white/10 shadow-2xl flex flex-col animate-fade-in" style="animation-delay: 0.1s">
                                     <div class="h-8 border-b border-white/5 flex items-center px-3 gap-2 shrink-0">
                                         <div class="flex gap-1.5">
@@ -276,7 +281,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Right: two stacked windows -->
                                 <div class="w-[38%] flex flex-col gap-4">
 
                                     <div class="flex-1 bg-[#1e293b] rounded-lg border border-white/10 shadow-2xl flex flex-col animate-fade-in" style="animation-delay: 0.2s">
@@ -361,6 +365,7 @@
 
     <footer class="border-t border-white/5 py-12 bg-[#020617] relative">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs">WS</div>
                 <div class="text-sm text-gray-400">
@@ -368,15 +373,70 @@
                 </div>
             </div>
             
-            <div class="flex gap-8 text-sm font-medium text-gray-500">
-                <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                <a href="#" class="hover:text-white transition-colors">Support</a>
-                <a href="../" class="hover:text-white transition-colors">More Apps</a>
+            <p class="text-sm text-gray-500 md:absolute md:left-1/2 md:-translate-x-1/2">
+                Copyright © 2026 BauerHaus LLC. All rights reserved.
+            </p>
+
+            <div class="flex gap-6 text-sm font-medium text-gray-500">
+                <button onclick="toggleModal('about')" class="hover:text-white transition-colors cursor-pointer">About</button>
+                <button onclick="toggleModal('contact')" class="hover:text-white transition-colors cursor-pointer">Contact</button>
+                <button onclick="toggleModal('privacy')" class="hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
             </div>
 
-            <p class="text-xs text-gray-600">© 2026 BauerHaus LLC.</p>
         </div>
     </footer>
 
+    <div id="about" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleModal('about')">×</button>
+            <h2 class="text-2xl font-semibold mb-3 tracking-tight" style="margin-top:0; letter-spacing: -0.02em;">About BauerHaus.</h2>
+            <p style="color:#86868b; line-height: 1.6; margin: 0;">
+                We build high-quality, native utilities designed exclusively for macOS. Our mission is to create software that feels right at home on your machine: fast, efficient, and crafted with pure Swift.
+            </p>
+        </div>
+    </div>
+
+    <div id="privacy" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleModal('privacy')">×</button>
+            <h2 class="text-2xl font-semibold mb-3 tracking-tight" style="margin-top:0; letter-spacing: -0.02em;">Your Data is Yours.</h2>
+            <p style="color:#86868b; line-height: 1.6; margin: 0;">
+                We believe software should serve you, not track you. Our apps work 100% locally on your machine. No analytics, no telemetry, no cloud requirement.
+            </p>
+        </div>
+    </div>
+
+    <div id="contact" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleModal('contact')">×</button>
+            <h2 class="text-2xl font-semibold mb-3 tracking-tight" style="margin-top:0; letter-spacing: -0.02em;">Get in Touch.</h2>
+            <p style="color:#86868b; line-height: 1.6; margin: 0;">
+                Have a question or feedback? We'd love to hear from you.
+            </p>
+            <a href="mailto:bauer@bauerhaus.io" style="display: inline-block; margin-top: 8px; color: #2997ff; font-weight: 500; text-decoration: none;">
+                bauer@bauerhaus.io →
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('open')) {
+                modal.classList.remove('open');
+            } else {
+                modal.classList.add('open');
+            }
+        }
+
+        window.onclick = function(event) {
+            ['about', 'privacy', 'contact'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target == modal) {
+                    modal.classList.remove('open');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
