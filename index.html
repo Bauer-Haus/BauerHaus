@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BauerHaus - Native Mac Utilities</title>
 
-```
 <script type="speculationrules">
 {
   "prerender": [{"source": "list", "urls": ["WindowSmith/"], "eagerness": "eager"}]
@@ -299,12 +297,10 @@
         to { opacity: 1; transform: translateY(0); }
     }
 </style>
-```
 
 </head>
 <body>
 
-```
 <div class="ambient-light"></div>
 
 <div class="container">
@@ -364,11 +360,22 @@
         <div class="footer-content">
             <p>Copyright © 2026 BauerHaus LLC. All rights reserved.</p>
             <div style="display: flex; gap: 20px;">
+                <button class="footer-link" onclick="toggleModal('about')">About</button>
                 <button class="footer-link" onclick="toggleModal('contact')">Contact</button>
                 <button class="footer-link" onclick="toggleModal('privacy')">Privacy Policy</button>
             </div>
         </div>
     </footer>
+</div>
+
+<div id="about" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="toggleModal('about')">×</button>
+        <h2 style="margin-top:0; font-size: 1.5rem; letter-spacing: -0.02em;">About BauerHaus.</h2>
+        <p style="color:var(--text-dim); line-height: 1.6;">
+            We build high-quality, native utilities designed exclusively for macOS. Our mission is to create software that feels right at home on your machine—fast, efficient, and crafted with pure Swift.
+        </p>
+    </div>
 </div>
 
 <div id="privacy" class="modal">
@@ -405,7 +412,7 @@
     }
 
     window.onclick = function(event) {
-        ['privacy', 'contact'].forEach(id => {
+        ['about', 'privacy', 'contact'].forEach(id => {
             const modal = document.getElementById(id);
             if (event.target == modal) {
                 modal.classList.remove('open');
@@ -413,7 +420,6 @@
         });
     }
 </script>
-```
 
 </body>
 </html>
