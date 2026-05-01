@@ -106,11 +106,35 @@
             z-index: -1;
             border-radius: 50%;
         }
+
+        /* FIX: These Tailwind-style utilities are referenced in markup but are not
+           built-in classes — perspective-1000 and rotate-x-6 must be defined here. */
+        .perspective-1000 { perspective: 1000px; }
+        .rotate-x-6 { transform: rotateX(6deg); }
+
+        /* FIX: Snap popup — hidden by default, revealed on hover of the icon button.
+           Using plain CSS here because the Tailwind group/name variant requires
+           the group and group-hover classes to be on the same element chain, but
+           overflow:hidden on ancestor containers can interfere with Tailwind's
+           group-hover scoping at the CDN build level. */
+        .snap-popup {
+            display: none;
+        }
+        .snap-btn:hover .snap-popup,
+        .snap-btn:focus-within .snap-popup {
+            display: block;
+        }
+
+        /* FIX: The mock screen's overflow:hidden was clipping the popup.
+           Allow the menubar strip to overflow so the dropdown can escape. */
+        .mock-menubar {
+            overflow: visible;
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-500/30 selection:text-blue-200">
 
-    <nav class="fixed w-full z-50 top-0 start-0 glass-nav">
+    <nav class="fixed w-full z-50 top-0 left-0 glass-nav">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <a href="../" class="group flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">
@@ -169,23 +193,33 @@
             <div id="demo" class="relative mx-auto max-w-5xl perspective-1000 group">
                 <div class="app-glow-bg transition-opacity duration-700 group-hover:opacity-40"></div>
                 
-                <div class="relative rounded-xl border border-white/10 bg-[#1e293b]/60 backdrop-blur-xl shadow-2xl p-1 md:p-2 transform transition-all duration-700 hover:scale-[1.01] hover:rotate-0 rotate-x-6">
+                <div class="relative rounded-xl border border-white/10 bg-[#1e293b]/60 backdrop-blur-xl shadow-2xl p-1 md:p-2 transform transition-all duration-700 hover:scale-[1.01] hover:rotate-x-0 rotate-x-6">
                     
-                    <div class="bg-[#0f172a] rounded-lg overflow-hidden relative h-[400px] md:h-[500px] w-full border border-white/5">
+                    <!-- FIX: Removed overflow-hidden from this container so the snap popup
+                         is not clipped. Rounded corners on inner content are preserved by
+                         the rounded-lg class on the inner bg div below. -->
+                    <div class="bg-[#0f172a] rounded-lg relative h-[400px] md:h-[500px] w-full border border-white/5">
                         
-                        <div class="absolute top-0 left-0 right-0 h-9 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between z-20 backdrop-blur-md">
+                        <!-- FIX: Added mock-menubar class (overflow:visible) so the absolute-
+                             positioned dropdown can render outside the h-9 strip's bounds. -->
+                        <div class="mock-menubar absolute top-0 left-0 right-0 h-9 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between z-20 backdrop-blur-md rounded-t-lg">
                             <div class="flex gap-4 text-[11px] font-semibold text-white">
-                                <span class="opacity-90"></span>
+                                <span class="opacity-90"></span>
                                 <span class="opacity-90">WindowSmith</span>
                                 <span class="opacity-60 font-normal">Edit</span>
                                 <span class="opacity-60 font-normal">View</span>
                                 <span class="opacity-60 font-normal">Window</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded bg-blue-500 text-white flex items-center justify-center relative cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.6)]">
+                                <!-- FIX: Added snap-btn class to trigger popup on hover.
+                                     Previously the popup had no visibility toggle at all —
+                                     it was always rendered and always visible. -->
+                                <div class="snap-btn w-6 h-6 rounded bg-blue-500 text-white flex items-center justify-center relative cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.6)]">
                                     <i class="ph-bold ph-layout"></i>
                                     
-                                    <div class="absolute top-full right-0 mt-4 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl p-5 z-50 text-left">
+                                    <!-- FIX: snap-popup class hides this by default;
+                                         it appears on hover via .snap-btn:hover .snap-popup. -->
+                                    <div class="snap-popup absolute top-full right-0 mt-4 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl p-5 z-50 text-left">
                                         <div class="absolute -top-1.5 right-2 w-3 h-3 bg-[#1e293b] border-t border-l border-white/10 rotate-45"></div>
                                         
                                         <div class="flex justify-between items-center mb-4">
@@ -217,12 +251,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    </div>
+                                </div>
                                 <span class="text-xs font-medium text-white opacity-90">Mon 9:41 AM</span>
                             </div>
                         </div>
 
-                        <div class="absolute inset-0 top-9 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex items-center justify-center overflow-hidden">
+                        <div class="absolute inset-0 top-9 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex items-center justify-center overflow-hidden rounded-b-lg">
                             <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 30px 30px;"></div>
 
                             <div class="absolute left-6 top-6 bottom-6 w-[55%] bg-[#1e293b] rounded-lg border border-white/10 shadow-2xl flex flex-col animate-fade-in" style="animation-delay: 0.1s">
