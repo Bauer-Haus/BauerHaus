@@ -1,0 +1,15 @@
+# SHA-256 checksums for WindowSmith disk images.
+#
+# Verify a download before you open it:
+#
+#   shasum -a 256 ~/Downloads/WindowSmith-1.1.dmg
+#
+# and compare the result to the line below. They must match exactly.
+#
+# Sparkle's automatic updates do not need this file: the appcast enclosure is
+# signed with the EdDSA key baked into the app, and Sparkle refuses any build
+# whose signature does not verify. These checksums cover the manual download
+# from bauerhaus.io, which has no such protection.
+
+674fd79bed8e692c666de8b8d456cae468f937e39008c6187e36f16a5e38e976  WindowSmith-1.0.dmg
+6660b7e4c60eb24a10c1a91767eafce48fc80b237d35d49d44e1a42679036d89  WindowSmith-1.1.dmg
