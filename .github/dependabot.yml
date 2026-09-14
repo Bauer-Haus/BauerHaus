@@ -1,0 +1,14 @@
+# Keep the Actions used by the deploy pipeline patched. These workflows hold a
+# token that can write to the repo and publish to Pages, so a compromised or
+# simply outdated action is the highest-value thing in the repository to keep
+# current.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"

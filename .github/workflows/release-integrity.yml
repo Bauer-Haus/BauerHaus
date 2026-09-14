@@ -1,0 +1,38 @@
+# Guards the update feed against a release that does not match what is actually
+# in the repository.
+#
+# Sparkle already refuses an update whose EdDSA signature does not verify, so a
+# mismatch here is usually a mistake rather than an attack: a DMG rebuilt
+# without refreshing the appcast, a stale `length`, a checksum nobody updated.
+# Either way it reaches users as a broken or unverifiable download, so it should
+# fail here instead of on the live site.
+name: Release integrity
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "WindowSmith/appcast.xml"
+      - "WindowSmith/downloads/**"
+      - ".github/workflows/release-integrity.yml"
+  pull_request:
+    paths:
+      - "WindowSmith/appcast.xml"
+      - "WindowSmith/downloads/**"
+      - ".github/workflows/release-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check the appcast against the shipped builds
+        run: python3 .github/scripts/verify_release.py

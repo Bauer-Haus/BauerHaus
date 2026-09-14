@@ -4,7 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Cams</title>
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+
+    <!-- Keep this page out of search results and caches. It is not linked from
+         anywhere on the site, and the prompt below is not access control. -->
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- GitHub Pages cannot set response headers, so the policy ships in the
+         page. This page embeds third-party players, which is exactly why it
+         needs the tightest allowlist on the site: an embed can only reach the
+         hosts named here, and nothing on this page can load script from
+         anywhere but jsdelivr. -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+        font-src 'self' data:;
+        img-src 'self' data:;
+        media-src blob: https://usw01-smr05-relay.ozolio.com;
+        connect-src 'self' https://usw01-smr05-relay.ozolio.com;
+        worker-src blob:;
+        frame-src https://www.youtube-nocookie.com https://g1.ipcamlive.com;
+        object-src 'none';
+        base-uri 'none';
+        form-action 'none';
+        upgrade-insecure-requests">
+
+    <!-- Pinned to an exact version and checked against a Subresource Integrity
+         hash, so the browser refuses the file if a single byte differs from what
+         we reviewed. 7.21.7 also clears four advisories (one high) in the
+         @xmldom/xmldom copy bundled into the 7.20.3 build. -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/video.js@7.21.7/dist/video-js.min.css"
+          integrity="sha384-m/+gruJNOZgxOA44GgPxiXxSBPKfJTu36EVTc8fYIVPKd6V8pBhUoCHx/Zl71xQL"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
         body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         #gatekeeper { margin-top: 100px; text-align: center; letter-spacing: 2px; }
@@ -20,10 +53,20 @@
         <p>SECURE ACCESS REQUIRED</p>
     </div>
 
-    <div id="main-content"></div> <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <div id="main-content"></div>
+    <script src="https://cdn.jsdelivr.net/npm/video.js@7.21.7/dist/video.min.js"
+            integrity="sha384-Y3EQVQUuP3pM9Mj1YjwJhLxImXD5UIFtZVttZR+PnnpTUsGwZ95wwEq818s1Yc68"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         // --- 1. YOUR CAMERA LIST ---
         // Just add a new line here to add a camera!
+        //
+        // Anything you paste in here ends up driving an <iframe> or a <video>, so
+        // the engine below validates it: URLs must be https, and a YouTube entry
+        // must be a bare 11-character video ID. A URL that does not pass is
+        // skipped with a message in the console rather than being handed to the
+        // browser. That is what stops a copy-pasted `javascript:` URL, or a
+        // title with markup in it, from turning this page into an XSS.
         const myCameras = [
             { title: "Newport Beach Pier", type: "iframe", url: "https://g1.ipcamlive.com/player/player.php?alias=blackiessurfcam2&autoplay=1" },
             { title: "Big Sky", type: "youtube", url: "dMr-Jt_K3Cc" },
@@ -31,36 +74,122 @@
         ];
 
         // --- 2. THE ENGINE ---
-function loadDashboard() {
-    const container = document.getElementById('main-content');
-    
-    myCameras.forEach((cam, index) => {
-        const camDiv = document.createElement('div');
-        camDiv.className = 'cam-container';
-        
-        let playerHtml = '';
-        if (cam.type === "youtube") {
-            playerHtml = `<iframe src="https://www.youtube.com/embed/${cam.url}?mute=1" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-        } else if (cam.type === "iframe") {
-            playerHtml = `<iframe src="${cam.url}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        } else {
+
+        // A YouTube video ID, and nothing that could be read as anything else.
+        const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
+
+        function httpsUrlOrNull(value) {
+            try {
+                const parsed = new URL(value);
+                return parsed.protocol === "https:" ? parsed.href : null;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function makeFrame(src) {
+            const frame = document.createElement("iframe");
+            frame.src = src;
+            frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+            frame.allowFullscreen = true;
+            frame.loading = "lazy";
+            // Don't tell the embed which page it is sitting on.
+            frame.referrerPolicy = "no-referrer";
+            return frame;
+        }
+
+        function buildPlayer(cam, index) {
+            if (cam.type === "youtube") {
+                if (!YOUTUBE_ID.test(cam.url)) {
+                    console.warn("Skipping camera with a malformed YouTube ID:", cam.title);
+                    return null;
+                }
+                // youtube-nocookie keeps YouTube from setting tracking cookies on
+                // visitors who never press play.
+                return makeFrame("https://www.youtube-nocookie.com/embed/" + cam.url + "?mute=1");
+            }
+
+            const src = httpsUrlOrNull(cam.url);
+            if (!src) {
+                console.warn("Skipping camera with a non-https or malformed URL:", cam.title);
+                return null;
+            }
+
+            if (cam.type === "iframe") {
+                return makeFrame(src);
+            }
+
             // HLS Video.js Engine
-            playerHtml = `<video id="cam${index}" class="video-js vjs-default-skin" controls preload="auto"><source src="${cam.url}" type="application/x-mpegURL"></video>`;
+            const video = document.createElement("video");
+            video.id = "cam" + index;
+            video.className = "video-js vjs-default-skin";
+            video.controls = true;
+            video.preload = "auto";
+
+            const source = document.createElement("source");
+            source.src = src;
+            source.type = "application/x-mpegURL";
+            video.appendChild(source);
+
+            return video;
         }
 
-        camDiv.innerHTML = `<h2>Live Feed ${index + 1} - ${cam.title}</h2>${playerHtml}`;
-        container.appendChild(camDiv);
+        function loadDashboard() {
+            const container = document.getElementById('main-content');
 
-        // --- ADD THIS TO WAKE UP VIDEO.JS ---
-        if (cam.type === "hls") {
-            videojs(`cam${index}`); 
+            myCameras.forEach((cam, index) => {
+                const player = buildPlayer(cam, index);
+                if (!player) {
+                    return;
+                }
+
+                const camDiv = document.createElement('div');
+                camDiv.className = 'cam-container';
+
+                // textContent, not innerHTML: a camera title is treated as text,
+                // never as markup.
+                const heading = document.createElement('h2');
+                heading.textContent = `Live Feed ${index + 1} - ${cam.title}`;
+
+                camDiv.appendChild(heading);
+                camDiv.appendChild(player);
+                container.appendChild(camDiv);
+
+                // --- WAKE UP VIDEO.JS ---
+                // Kept inside its own try/catch: if video.js did not load - the
+                // CDN is down, or its Subresource Integrity hash did not match
+                // and the browser threw the file away - only this one feed
+                // should go quiet. Letting the error escape would abort the loop
+                // before the lines below run, and every camera would vanish
+                // behind a page that still says SECURE ACCESS REQUIRED.
+                if (cam.type === "hls") {
+                    try {
+                        if (typeof videojs === "function") {
+                            videojs(`cam${index}`);
+                        } else {
+                            console.warn("video.js unavailable; leaving native playback for:", cam.title);
+                        }
+                    } catch (err) {
+                        console.warn("video.js failed to start for:", cam.title, err);
+                    }
+                }
+            });
+
+            document.getElementById('gatekeeper').style.display = 'none';
+            container.style.display = 'grid';
         }
-    });
 
-    document.getElementById('gatekeeper').style.display = 'none';
-    container.style.display = 'grid';
-}
         // --- 3. THE GATEKEEPER ---
+        //
+        // HEADS UP: this is a doorbell, not a lock. The password is sitting in
+        // the source of a page anyone can fetch, and so are the camera URLs, so
+        // this keeps out casual visitors and nobody else. Treat everything on
+        // this page as public.
+        //
+        // If any of these feeds ever needs to be genuinely private, it has to be
+        // enforced somewhere the visitor cannot see: an authenticating proxy in
+        // front of the page (Cloudflare Access and Netlify's password protection
+        // both do this for static sites), not a check that runs in the browser.
         (function() {
             const input = prompt("Enter Password:");
             const accessCode = input ? input.trim().toLowerCase() : "";

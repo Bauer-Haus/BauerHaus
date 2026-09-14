@@ -6,9 +6,48 @@
     <title>WindowSmith - The Visual Window Manager | BauerHaus</title>
     <meta name="description" content="WindowSmith brings a visual snap grid to macOS. Hover, click, and instantly organize your screen with precision layouts.">
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Content-Security-Policy: GitHub Pages cannot set response headers, so
+         the policy ships in the page. Every origin listed here is one this page
+         genuinely needs; anything injected into the page that tries to reach
+         somewhere else is blocked by the browser.
+
+         'unsafe-eval' is here only because the Tailwind Play CDN compiles
+         utility classes in the browser at load time. Building Tailwind to a
+         static .css file in this repo would let both 'unsafe-eval' and
+         cdn.tailwindcss.com come straight out of this policy - see SECURITY.md. -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+        font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net;
+        img-src 'self' data:;
+        connect-src 'self';
+        frame-src 'none';
+        object-src 'none';
+        base-uri 'none';
+        form-action 'none';
+        upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Pinned to an exact version. An unpinned CDN URL means whatever that host
+         serves tomorrow runs on the page that hands out our installer. -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+    <!-- Phosphor icons used to arrive as a <script> from an unpinned unpkg URL,
+         which is arbitrary third-party JavaScript running with full authority on
+         the download page. The icon font only ever needed CSS, so these are the
+         same three weights as stylesheets, pinned to an exact version and
+         checked against a Subresource Integrity hash: if the bytes change at
+         all, the browser refuses to apply them. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css"
+          integrity="sha384-nblAP2mo2pVPyMQZDw9Xy9Cwgs9lowushAYep4w5+Q9kF4Ibf3n0B/gCMVdR+Vqy"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"
+          integrity="sha384-pPVoXE8ft+zxKtxIDDI7SfTK6y95NHm4qa+hKEg/hs8VkjW5IP+9/dGOPCbDpUPl"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css"
+          integrity="sha384-UVFvhZP7fWAENUPOoq61rJg5ef6QZW0k5vpAn71041/QS4STvUcJQCGNhStZLGx9"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -218,6 +257,18 @@
                     How it works
                 </a>
             </div>
+
+            <!-- Lets anyone confirm the DMG they downloaded is the one we published.
+                 Automatic updates are already covered: Sparkle checks the EdDSA
+                 signature on the appcast enclosure before installing anything. -->
+            <p class="mt-6 text-xs text-gray-500 font-mono break-all max-w-xl mx-auto">
+                SHA-256 &middot; WindowSmith-1.1.dmg<br>
+                <span class="text-gray-400">6660b7e4c60eb24a10c1a91767eafce48fc80b237d35d49d44e1a42679036d89</span><br>
+                <span class="font-sans">
+                    Verify with <code class="text-gray-400">shasum -a 256</code> &middot;
+                    <a href="downloads/SHA256SUMS.txt" class="text-blue-400 hover:underline">all checksums</a>
+                </span>
+            </p>
 
             <div id="demo" class="relative mx-auto max-w-5xl perspective-1000 group">
                 <div class="app-glow-bg transition-opacity duration-700 group-hover:opacity-40"></div>
