@@ -3,18 +3,24 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.1.2</title>
-            <pubDate>Sat, 19 Sep 2026 13:46:59 -0500</pubDate>
+            <title>1.2</title>
+            <pubDate>Sun, 20 Sep 2026 16:33:56 -0500</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>13</sparkle:version>
-            <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
+            <sparkle:version>14</sparkle:version>
+            <sparkle:shortVersionString>1.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Fixes</h2>
+            <description><![CDATA[<h2>New</h2>
 <ul>
-  <li>The Bias and Right Bias layouts now split the screen into exact thirds. Windows placed with them now meet windows placed with Thirds, Six Pack or a three-column custom grid, instead of leaving a thin strip of desktop between them.</li>
+  <li>Group cells in the Custom Grid Builder. Click the cells you want together, press Group, and they become one zone &mdash; so a 4&times;3 grid can be two tall columns beside a stack of four small ones. Hotkeys, arrow-key cycling and Drag to Snap all follow the grouped shape.</li>
+  <li>Custom grids can now be up to 5 rows by 5 columns.</li>
+</ul>
+
+<h2>Changed</h2>
+<ul>
+  <li>Clicking a cell in the builder now selects it rather than snapping the front window, since a click has to mean one thing and grouping needs it. To try a layout, save it first and click its miniature in the preset list or the menu bar.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.1.2.dmg" length="7526373" type="application/octet-stream" sparkle:edSignature="K6A5CXwcuC1LXVofMBKcPoF1WrEWpd8eTxrvvHa3FmYlyaMJLU5WoB7hqSKePQ1SszijjA2zav9Us5vki/ZEBQ=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.2.dmg" length="7555862" type="application/octet-stream" sparkle:edSignature="ICsbo+UQO8NLNEc6Ig/JxZTV1Z2TBfMolIXZej9P509t0lI+Sa7ulY73MFTtJtdkLueYMqFEtZRsJ/qz8V8rDQ=="/>
         </item>
     </channel>
 </rss>

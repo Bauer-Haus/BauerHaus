@@ -19,7 +19,7 @@ graph TD
         SettingsView["SettingsView"]
         Snap["SnapLayoutView"]
         Cell["PresetCell"]
-        Grid["InteractiveGridSelector"]
+        Grid["GridBuilderView<br/>cell selection · grouping"]
         Preview["SnapPreviewOverlay<br/>borderless · click-through NSWindow"]
 
         App -->|hosts| MenuBarView
