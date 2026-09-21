@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.1 (build 11).
+Reflects WindowSmith 1.2 (build 14).
 
 ```mermaid
 graph TD
@@ -37,7 +37,7 @@ graph TD
         UPD["UpdaterController<br/>wraps SPUStandardUpdaterController"]
 
         subgraph WC_Logic ["WindowController Internals"]
-            Geo["Geometry Engine<br/>relative rects · grid math · throw"]
+            Geo["Geometry Engine<br/>relative rects · throw"]
             Perm["Permission Watch<br/>trust notification + 1s poll"]
             Cycle["Cycle State<br/>5s arrow-key timeout"]
         end
@@ -45,6 +45,7 @@ graph TD
         DSM["DragSnapMonitor<br/>global mouse monitors · drag detection"]
         DSS["DragSnapSettings<br/>layout · trigger · enabled"]
         WL["WindowLookup<br/>window at point · coordinate flips"]
+        LM["Layout Model<br/>Preset.layout · GridMerges.blocks"]
 
         UD[("UserDefaults<br/>presets · hotkeys · drag-snap · prompt flag")]
     end
@@ -52,7 +53,7 @@ graph TD
     subgraph MacOS ["macOS System APIs"]
         AX["Accessibility API (AXUIElement)<br/>answered by the owning app"]
         CGW["CGWindowList<br/>answered by the WindowServer"]
-        WS["NSWorkspace<br/>frontmost app tracking"]
+        WS["NSWorkspace<br/>frontmost app · wake"]
         CG["NSScreen / CoreGraphics<br/>display bounds"]
         GCD["Grand Central Dispatch<br/>userInteractive queue"]
         SM["SMAppService<br/>Launch at Login"]
@@ -102,6 +103,13 @@ graph TD
     WL -->|Element to move · fallback frame| AX
     DSM -->|Previews the target zone| Preview
     DSM == "Applies the drop to that exact window" ==> WC
+    WS -.->|Wake · display change: rebuild| Preview
+
+    %% One zone decomposition for every consumer
+    WC -->|resolveLayout| LM
+    Cell -->|preset.layout| LM
+    SettingsView -->|preset.layout| LM
+    Grid -->|Draws the same blocks| LM
 
     %% Updates
     UPD --> SPK
@@ -109,7 +117,7 @@ graph TD
 
     %% Assign Classes
     class App,MenuBarView,Overlay,SWM,SettingsView,Snap,Cell,Grid,Preview ui;
-    class WC,GKM,UPD,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,WL core;
+    class WC,GKM,UPD,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,WL,LM core;
     class AX,WS,CG,GCD,SM,DNC,OSL,CGW sys;
     class SPK,Feed net;
     class TA target;
@@ -130,5 +138,11 @@ graph TD
 **Distinguishing a window drag from a drag inside a window.** Nothing announces that a window drag has begun, so a candidate window is captured on mouse-down and promoted only once its frame actually moves while its size holds steady — a changed size means a resize handle, not a title bar. Cursor distance cannot make this call: the reported position lags far behind the pointer before catching up, so "the cursor moved but the window has not" describes an ordinary drag just as well as a text selection. Only elapsed time separates them, and nothing is drawn before the gesture is confirmed, so waiting costs a few extra probes and no visible latency.
 
 **A preview that cannot swallow its own gesture.** The zone preview is a borderless, transparent `NSWindow` above the normal window level. It sits directly under the cursor for the entire drag, so it sets `ignoresMouseEvents` — without that it would consume the very drag it exists to illustrate.
+
+**A preview that survives a long sleep.** The preview window is created once and reused, and it joins every Space. After a long lid-closed sleep the Mac wakes from Deep Idle, treats the display as new hardware and rebuilds its Spaces, and a hidden window can come out of that belonging to none: ordering it front then reports success and shows nothing, indefinitely. So a hidden preview window is discarded on wake and on any display change, and every time it is shown it is asked whether it actually landed on the active Space; if not, it is replaced on the spot.
+
+**One zone decomposition.** A saved grid is rows, columns and an optional list of grouped blocks. `Preset.layout` is the only place that turns that into zones, and it does so through `GridMerges.blocks` - the same function the Custom Grid Builder draws from. The hotkey, the arrow-key cycle, drag-to-snap, both miniatures and the builder therefore cannot disagree about a layout's shape: there is one answer, not four copies of the arithmetic. Zones come out in row-major order with each group at its top-left cell, and that order is what the arrow keys walk.
+
+**Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
 
 **Asynchronous injection.** Sizing and positioning are dispatched on a background `userInteractive` queue with a short `usleep` buffer between the size and position writes, allowing the target application's UI thread to settle before the final coordinate snap.
