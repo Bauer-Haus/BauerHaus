@@ -33,19 +33,16 @@ exposed to CI; appcast entries are signed locally with Sparkle's `sign_update`
 before the feed is pushed. Losing the key means existing installs can no longer
 be updated, so it is kept backed up offline.
 
-**Manual downloads.** The DMG offered on the website is not signature-checked by
-the browser beyond Gatekeeper. Checksums for every published build are listed in
-[`WindowSmith/downloads/SHA256SUMS.txt`](WindowSmith/downloads/SHA256SUMS.txt):
-
-```sh
-shasum -a 256 ~/Downloads/WindowSmith-1.1.dmg
-```
+**Manual downloads.** The DMG offered on the website, and the app inside it, are
+signed with a Developer ID and notarized by Apple, with the notarization ticket
+stapled to both. Gatekeeper checks that signature when the download is opened, so
+a DMG altered after it was built will not open; no separate checksum is published.
 
 `.github/workflows/release-integrity.yml` re-checks, on every push and pull
 request, that each appcast enclosure points at a file that exists in the repo,
-that its `length` matches the real byte count, that its checksum matches
-`SHA256SUMS.txt`, and that it is served over HTTPS with a signature attached. A
-release that does not line up fails CI instead of reaching the site.
+that its `length` matches the real byte count, and that it is served over HTTPS
+with a signature attached. A release that does not line up fails CI instead of
+reaching the site.
 
 ## Scope
 
