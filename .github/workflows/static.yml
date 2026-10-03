@@ -40,6 +40,10 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
+          # v4 began leaving dot-files out of the published site, which would drop
+          # /.well-known/security.txt. This restores v3's behavior exactly: dot-files
+          # are included, and .git and .github are excluded regardless.
+          include-hidden-files: true
           # Upload entire repository
           path: '.'
       - name: Deploy to GitHub Pages
