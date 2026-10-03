@@ -7,7 +7,10 @@ For every <enclosure> in the appcast this verifies that:
   * the file it names actually exists in the repo,
   * the advertised `length` equals the real byte count,
   * an EdDSA signature is attached,
-  * the file's SHA-256 matches the line for it in SHA256SUMS.txt.
+  * the file's SHA-256 matches the line for it in SHA256SUMS.txt,
+
+and that the checksum printed on the download page is the current build's, so the
+page can never show a hash for a different file than its buttons hand out.
 
 Run it by hand with: python3 .github/scripts/verify_release.py
 """
@@ -16,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import pathlib
+import re
 import sys
 import xml.etree.ElementTree as ET
 from urllib.parse import urlsplit
@@ -24,6 +28,7 @@ REPO = pathlib.Path(__file__).resolve().parents[2]
 APPCAST = REPO / "WindowSmith" / "appcast.xml"
 DOWNLOADS = REPO / "WindowSmith" / "downloads"
 SUMS = DOWNLOADS / "SHA256SUMS.txt"
+PAGE = REPO / "WindowSmith" / "index.html"
 
 SPARKLE_NS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 ALLOWED_HOSTS = {"bauerhaus.io", "www.bauerhaus.io"}
@@ -60,6 +65,30 @@ def load_checksums() -> dict[str, str]:
         digest, name = parts[0], parts[1].lstrip("*")
         sums[name] = digest.lower()
     return sums
+
+
+def check_download_page(checksums: dict[str, str], current: set[str]) -> None:
+    """The page prints one build's checksum beside its download buttons. Each release
+    moves the buttons to the new DMG; if the printed checksum is left behind, anyone who
+    checks it sees a mismatch and concludes the download was tampered with."""
+    if not PAGE.is_file():
+        return
+    html = PAGE.read_text()
+    shown = re.search(r"SHA-256 &middot; (WindowSmith-[\d.]+\.dmg)<br>\s*<span[^>]*>([0-9a-f]{64})</span>", html)
+    if not shown:
+        fail("WindowSmith/index.html: no checksum line found beside the download buttons")
+        return
+    name, digest = shown.group(1), shown.group(2)
+    before = len(problems)
+    linked = set(re.findall(r'href="downloads/(WindowSmith-[\d.]+\.dmg)"', html))
+    if linked != {name}:
+        fail(f"WindowSmith/index.html: shows the checksum for {name} but its download links point at {sorted(linked)}")
+    if current and name not in current:
+        fail(f"WindowSmith/index.html: shows the checksum for {name}, but the appcast ships {sorted(current)}")
+    if checksums.get(name) != digest:
+        fail(f"WindowSmith/index.html: checksum shown for {name} does not match SHA256SUMS.txt")
+    if len(problems) == before:
+        print(f"ok  download page shows {name}  sha256={digest}")
 
 
 def main() -> int:
@@ -116,6 +145,8 @@ def main() -> int:
             fail(f"{label}: SHA256SUMS.txt says {expected} but the file hashes to {digest}")
         else:
             print(f"ok  {name}  {actual_size} bytes  sha256={digest}")
+
+    check_download_page(checksums, seen)
 
     # A checksum line for a build that is no longer shipped is stale, not fatal.
     for name in sorted(set(checksums) - seen):
