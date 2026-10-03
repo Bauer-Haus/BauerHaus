@@ -3,20 +3,20 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.3</title>
-            <pubDate>Fri, 25 Sep 2026 18:50:23 -0500</pubDate>
+            <title>1.3.1</title>
+            <pubDate>Sat, 03 Oct 2026 18:08:24 -0500</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>15</sparkle:version>
-            <sparkle:shortVersionString>1.3</sparkle:shortVersionString>
+            <sparkle:version>16</sparkle:version>
+            <sparkle:shortVersionString>1.3.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>New (beta)</h2>
+            <description><![CDATA[<h2>Quick Snap on the green button (beta)</h2>
 <ul>
-  <li>Quick Snap on the green button. Rest the pointer on any window's green button and WindowSmith's Quick Snap layouts appear beside it; click a zone to place that window, even one in the background. Turn it on in Settings &rarr; Green Button.</li>
-  <li>It replaces Apple's own green-button menu while it is on, and brings Apple's back when it is off. WindowSmith asks before changing this, and apps that are already open keep Apple's menu until they're reopened.</li>
-  <li>This is a beta, and off unless you turn it on. It watches mouse movement to notice the green button, which uses a little extra CPU and battery while the pointer is moving.</li>
+  <li>The palette now has a Liquid Glass background on macOS 26 and later, matching Apple's own green-button menu.</li>
+  <li>It uses about a tenth of the CPU it did while the pointer is moving, by skipping all work unless the pointer is near a window's top-left corner.</li>
+  <li>The Green Button section in Settings now shows which button it means, and says where to find it.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.dmg" length="7612590" type="application/octet-stream" sparkle:edSignature="l5Uw0Ki4ts4fRREUlSQDorO0Ak00gWhgf6t09vpahKoa+1xqE0eSO7a+y2cUuHT7WF/lIHRX1F8cxErQhdw7BQ=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.1.dmg" length="7621103" type="application/octet-stream" sparkle:edSignature="CdFmw5BLLf++uJYkpiXjYZoEqNfgk5tYlbXkb+plgOJmIa1GbRs/UJE4Pgd0+G9u5oo7tqn9KtYw8DfGVYpwCg=="/>
         </item>
     </channel>
 </rss>
