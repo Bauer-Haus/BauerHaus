@@ -48,6 +48,14 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Belt and braces: the workflow_dispatch choice already limits this to
+          # on/off, but the swap below moves real pages around, so refuse
+          # anything unexpected rather than guessing.
+          if [ "$STATE" != "on" ] && [ "$STATE" != "off" ]; then
+            echo "::error::Unexpected state '$STATE' - expected 'on' or 'off'." >&2
+            exit 1
+          fi
+
           # Every directory whose index.html should be swapped. Add a line here
           # if the site grows another page that belongs behind maintenance.
           PAGES=("." "WindowSmith")
@@ -72,6 +80,14 @@ jobs:
           done
 
       - name: Commit the swap
+        # STATE goes through the environment, never straight into the script
+        # body. A ${{ }} expression is pasted in as literal shell text before
+        # bash ever runs, so an input containing shell syntax would execute with
+        # this job's contents:write token. The choice input makes that
+        # impossible today; keeping the pattern right means it stays impossible
+        # if the input ever becomes free-form.
+        env:
+          STATE: ${{ inputs.state }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -80,7 +96,7 @@ jobs:
             echo "Nothing changed - redeploying the current state."
           else
             git add -A
-            git commit -m "Maintenance mode: ${{ inputs.state }}"
+            git commit -m "Maintenance mode: $STATE"
             git push
           fi
 
