@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.1 (build 16).
+Reflects WindowSmith 1.3.2 (build 17).
 
 ```mermaid
 graph TD
