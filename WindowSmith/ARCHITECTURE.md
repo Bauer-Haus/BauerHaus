@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3 (build 15).
+Reflects WindowSmith 1.3.1 (build 16).
 
 ```mermaid
 graph TD
@@ -21,7 +21,7 @@ graph TD
         Cell["PresetCell"]
         Grid["GridBuilderView<br/>cell selection · grouping"]
         Preview["SnapPreviewOverlay<br/>borderless · click-through NSWindow"]
-        Palette["ZoomPalettePanel<br/>non-activating NSPanel · rebuilt per open"]
+        Palette["ZoomPalettePanel<br/>non-activating NSPanel · Liquid Glass · rebuilt per open"]
 
         App -->|hosts| MenuBarView
         MenuBarView -->|when untrusted| Overlay
@@ -48,7 +48,7 @@ graph TD
         DSS["DragSnapSettings<br/>layout · trigger · enabled"]
         WL["WindowLookup<br/>window at point · coordinate flips"]
         LM["Layout Model<br/>Preset.layout · GridMerges.blocks"]
-        ZPM["ZoomPaletteMonitor<br/>pointer resting on a green button"]
+        ZPM["ZoomPaletteMonitor<br/>pointer resting on a green button · saved button corners"]
         ZPS["ZoomPaletteSettings<br/>one switch · palette + Apple's menu"]
 
         UD[("UserDefaults<br/>presets · hotkeys · drag-snap · green button · prompt flag")]
@@ -120,6 +120,7 @@ graph TD
     SettingsView -->|Asks, then configures| ZPS
     ZPS -.->|Arms / disarms| ZPM
     ZPS -->|Hides / restores Apple's menu| GP
+    ZPM -->|Every window's button corner, at most once a second| CGW
     ZPM -->|Window and button under the pointer| WL
     ZPM -->|Opens beside the button| Palette
     ZPM == "Places that exact window" ==> WC
@@ -158,9 +159,11 @@ graph TD
 
 **Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
 
-**Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and the checks run from cheap to costly. The WindowServer names the single window under the pointer, which measured about three times faster than copying the full window list and, unlike the list, does not grow with the number of windows open. Only when the pointer is in that window's top-left corner, the 100×70pt where traffic lights can sit under a tall unified toolbar, is the app itself asked through Accessibility what is there; a green button reports the subrole `AXFullScreenButton`, or `AXZoomButton` in a window that can only zoom. That query is capped at a 0.1s timeout and at most one every 60ms. Throttling must not drop the moment of arrival, though: a resting pointer sends no more events, so a movement that lands inside the 60ms window schedules one look at wherever the pointer ends up, and a corner with no answer is retried every 0.1s for up to a second. Nothing runs while the pointer is still, and nothing at all while the feature is off.
+**Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and nearly all of that work is avoided outright. Every on-screen window's button corner, the top-left 100×70pt where traffic lights can sit under a tall unified toolbar, is fetched from the WindowServer and kept. Those corners cover around a percent of the screen, so almost every movement falls outside all of them and is dismissed with a few comparisons, without asking anyone anything. They are refetched at most once a second while the pointer moves, and marked stale after a click, an app switch, a Space change, or the palette itself moving a window, since that is when windows usually move. The price is that a window moved without the mouse - by a keyboard shortcut, a hotkey, an app resizing itself - can be missed for up to that second. Measured, this took the cost while the pointer moves from about 0.56% of a core to about 0.05%.
 
-**A palette that does not take focus.** The palette is a non-activating `NSPanel`, so choosing a zone leaves the app being arranged in front with its keyboard focus, and its hosting view accepts the first click, since a panel that never becomes key would otherwise spend that click on focusing itself. The chosen zone is applied to the window whose button was hovered, not to whatever is frontmost, which is what lets it arrange a background window. And for the same reason the drag preview needs rebuilding after a long sleep, the panel is not reused at all: it is built on every open and discarded on close.
+Inside a saved corner the checks run from cheap to costly. The WindowServer names the single window under the pointer, which measured about three times faster than copying the full window list and does not grow with the number of windows open; only if the pointer is in that window's own corner is the app asked through Accessibility what is there. A green button reports the subrole `AXFullScreenButton`, or `AXZoomButton` in a window that can only zoom. That query is capped at a 0.1s timeout and at most one every 60ms. Throttling must not drop the moment of arrival, though: a resting pointer sends no more events, so a movement that lands inside the 60ms window schedules one look at wherever the pointer ends up, and a corner with no answer is retried every 0.1s for up to a second. Nothing runs while the pointer is still, and nothing at all while the feature is off.
+
+**A palette that does not take focus.** The palette is a non-activating `NSPanel`, so choosing a zone leaves the app being arranged in front with its keyboard focus, and its hosting view accepts the first click, since a panel that never becomes key would otherwise spend that click on focusing itself. The chosen zone is applied to the window whose button was hovered, not to whatever is frontmost, which is what lets it arrange a background window. And for the same reason the drag preview needs rebuilding after a long sleep, the panel is not reused at all: it is built on every open and discarded on close. On macOS 26 and later it sits on `NSGlassEffectView`, the Liquid Glass Apple uses for its own green-button menu, with the same 18pt corners. That class does not exist on earlier systems, so it is weak-linked and checked with `#available`: macOS 13 through 15 launch normally and draw the frosted popover material instead.
 
 **Replacing Apple's menu.** Apple's green-button menu is controlled by one system-wide preference, `NSZoomButtonShowMenu` in the global domain. The palette's switch owns it: on writes `false`, off removes it, so the palette and Apple's menu are never both switched on or both off. Because that reaches every app on the Mac, turning the switch on asks first, and the preference is written only when the switch is flipped, never at launch. Apps read it only when they start, so windows already open keep Apple's menu until their app is reopened.
 
