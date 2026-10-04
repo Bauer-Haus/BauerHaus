@@ -36,7 +36,7 @@ jobs:
           # .git/config would let any later step push with it.
           persist-credentials: false
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
