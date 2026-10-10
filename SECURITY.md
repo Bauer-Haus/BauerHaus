@@ -18,6 +18,7 @@ Only the latest published release of each app receives security fixes.
 | Product     | Supported                       |
 | ----------- | ------------------------------- |
 | WindowSmith | Latest release (currently 1.1)  |
+| Nexa        | Latest release                  |
 | bauerhaus.io| Yes                             |
 
 ## Verifying a WindowSmith download

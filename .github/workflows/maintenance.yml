@@ -58,7 +58,9 @@ jobs:
 
           # Every directory whose index.html should be swapped. Add a line here
           # if the site grows another page that belongs behind maintenance.
-          PAGES=("." "WindowSmith")
+          # nexa/privacy is left out on purpose: it is the Privacy Policy URL in
+          # App Store Connect, and App Review must always be able to reach it.
+          PAGES=("." "WindowSmith" "nexa")
 
           for dir in "${PAGES[@]}"; do
             if [ "$STATE" = "on" ]; then

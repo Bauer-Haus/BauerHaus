@@ -1,0 +1,80 @@
+/* Shared by the Nexa pages. Kept in a file (not inline) so their
+   Content-Security-Policy can refuse every inline style and script. */
+:root {
+    --bg: #000000;
+    --surface: #121212;
+    --border: rgba(255, 255, 255, 0.1);
+    --text-main: #f5f5f7;
+    --text-dim: #a1a1a6;
+    --accent: #2997ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+header { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 14px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-main); }
+.logo:hover { text-decoration: none; }
+.logo-box {
+    width: 20px; height: 20px; border-radius: 4px; display: grid; place-items: center;
+    background: var(--text-main); color: var(--bg); font-size: 12px; font-weight: 800;
+}
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--text-dim); }
+.nav-links a:hover { color: var(--text-main); text-decoration: none; }
+
+.hero { padding: 72px 0 40px; display: flex; gap: 24px; align-items: center; }
+.hero img { width: 96px; height: 96px; flex-shrink: 0; }
+.hero h1 {
+    font-size: clamp(2.2rem, 7vw, 3.5rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 8px;
+}
+.hero p { margin: 0; color: var(--text-dim); font-size: 1.2rem; }
+
+h1.page { font-size: clamp(2rem, 6vw, 2.75rem); letter-spacing: -0.02em; line-height: 1.1; margin: 56px 0 8px; }
+.updated { color: var(--text-dim); margin: 0 0 32px; }
+
+h2 { font-size: 1.5rem; letter-spacing: -0.01em; margin: 48px 0 12px; }
+h3 { font-size: 1.1rem; margin: 28px 0 6px; }
+p, li { color: var(--text-dim); }
+strong { color: var(--text-main); font-weight: 600; }
+ul, ol { padding-left: 1.3em; }
+li { margin: 6px 0; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 8px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 22px; }
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; }
+
+.notice {
+    background: rgba(41, 151, 255, 0.08); border: 1px solid rgba(41, 151, 255, 0.3);
+    border-radius: 16px; padding: 16px 20px; margin: 24px 0;
+}
+.notice p { margin: 0; color: var(--text-main); }
+
+details { border-bottom: 1px solid var(--border); padding: 14px 0; }
+details summary { cursor: pointer; font-weight: 600; color: var(--text-main); }
+details p { margin: 10px 0 0; }
+
+footer { border-top: 1px solid var(--border); margin-top: 72px; padding: 40px 0; font-size: 13px; color: var(--text-dim); }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+footer a { color: var(--text-dim); }
+
+@media (max-width: 560px) {
+    .hero { flex-direction: column; align-items: flex-start; padding-top: 48px; }
+    .hero img { width: 72px; height: 72px; }
+}

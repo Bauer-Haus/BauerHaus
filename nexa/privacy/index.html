@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- GitHub Pages cannot set response headers, so the policy ships in the page.
+         Plain HTML with one stylesheet from this site: no script, nothing inline,
+         nothing from another origin. This page is the Privacy Policy URL in
+         App Store Connect, so it is left out of maintenance mode on purpose. -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none';
+        style-src 'self';
+        img-src 'self';
+        base-uri 'none';
+        form-action 'none';
+        upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Nexa Privacy Policy | BauerHaus</title>
+    <meta name="description" content="Nexa collects no data. What leaves your Mac, who can see it, and what we never receive.">
+    <link rel="stylesheet" href="../nexa.css">
+    <link rel="icon" href="../icon.png">
+</head>
+<body>
+
+<header>
+    <div class="wrap nav">
+        <a class="logo" href="/"><span class="logo-box">B</span><span>BauerHaus</span></a>
+        <nav class="nav-links">
+            <a href="../">Nexa</a>
+            <a href="../#help">Help</a>
+        </nav>
+    </div>
+</header>
+
+<main class="wrap">
+    <h1 class="page">Nexa Privacy Policy</h1>
+    <p class="updated">Effective October 10, 2026</p>
+
+    <div class="notice">
+        <p><strong>In short:</strong> Nexa collects no data. There are no accounts, no analytics and no tracking, and we (BauerHaus LLC) never receive your messages, contacts or anything about how you use the app. Your messages leave your Mac only in encrypted form, through public servers that can't read them.</p>
+    </div>
+
+    <p>This policy covers the Nexa Messenger app for macOS, made by BauerHaus LLC (“we”). It describes exactly what the app does with information, so you can check it against how the app behaves.</p>
+
+    <h2>What we collect</h2>
+    <p><strong>Nothing.</strong> Nexa has no sign-up, no user accounts and no servers run by us. It contains no analytics, advertising, tracking or crash-reporting code, and it never sends us your messages, contacts, display name, IP address or usage information. We can't identify who uses Nexa.</p>
+    <p>The only time we receive anything is when you choose to email us, for example by sending a report (see <a href="#reports">Reports</a>). If you have opted in to share crash data with developers in macOS, Apple may pass anonymous crash reports to us under Apple's own privacy policy.</p>
+
+    <h2>What stays on your Mac</h2>
+    <p>Your chats, contacts, files and settings are stored only on your Mac, inside Nexa's own sandboxed folder. The message database is encrypted with a key kept in your Mac's Keychain, and you can add a passphrase and Touch ID lock. <strong>Move to Backup</strong> (Settings &rsaquo; Backup) saves it to an encrypted file you keep, then erases all of it from the Mac.</p>
+
+    <h2>What leaves your Mac, and who can see it</h2>
+    <p>To deliver messages without a central server, Nexa uses public infrastructure run by independent operators. None of them are run by us, and none of them can read your messages.</p>
+
+    <h3>Nostr relays (messages)</h3>
+    <p>Each message is end-to-end encrypted on your Mac and sent to public Nostr relays, which hold it until your contact's Mac picks it up. A relay sees only encrypted data of a padded size, the time it was sent, and a one-time address that changes with every message. It can't see who you are, who you are talking to, or what you said. Nexa asks relays to delete messages after 14 days by default (you can change this), but relays are run by others and may keep the encrypted data longer. You can see and change which relays are used in Settings &rsaquo; Relays, including who operates each one.</p>
+
+    <h3>File servers (attachments)</h3>
+    <p>Files you send are encrypted on your Mac and uploaded in pieces to public Blossom file servers, then downloaded by your contact. The servers see only encrypted pieces of a padded size. Nexa asks the servers to delete them once they are delivered.</p>
+
+    <h3>Your IP address</h3>
+    <p>In <strong>Maximum privacy</strong> mode, Nexa connects through the Tor network, and relays and file servers don't see your IP address. In <strong>Standard</strong> mode, Nexa connects directly, and each relay or file server you use can see your IP address, as any website you visit can.</p>
+
+    <h3>DNS (Standard mode)</h3>
+    <p>In Standard mode, Nexa looks up relay addresses with encrypted DNS, through Cloudflare by default, Quad9, or a provider you enter, under that provider's privacy policy. You can turn this off in Settings &rsaquo; Network to use your Mac's normal DNS. In Maximum privacy mode, lookups happen inside Tor.</p>
+
+    <h3>Your contacts</h3>
+    <p>Your contacts receive what you send them, plus the display name you set in Settings, if any. Nobody else does: there is no directory, and nobody can find or message you without an invite link you share.</p>
+
+    <h2>Camera</h2>
+    <p>Nexa uses the camera only when you choose to scan an invite or security-code QR code. Images are processed on your Mac and are never saved or sent anywhere.</p>
+
+    <h2 id="reports">Reports</h2>
+    <p>If you report someone with <strong>Report…</strong>, Nexa writes an email draft to us in your own mail app, containing only the messages you choose to include and anything you type. Nothing is sent unless you send it. We use reports only to respond to you and to keep people safe, keep them only as long as needed for that, and never sell or share them, unless the law requires it.</p>
+
+    <h2>Backups</h2>
+    <p>Backups are files you save where you choose, encrypted with a recovery code that only you see. We never receive your backups or your code, and can't open or recover them.</p>
+
+    <h2>Children</h2>
+    <p>Nexa is not directed at children under 13, and we don't knowingly collect information from anyone, including children.</p>
+
+    <h2>Your rights</h2>
+    <p>Because we hold no personal data about you, there is nothing for us to access, correct, export or delete. All of your data is on your Mac and under your control. If you emailed us and want that email deleted, ask and we will delete it.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, we will update it on this page and change the effective date above. If a change affects what leaves your Mac, we will say so in the app's release notes.</p>
+
+    <h2>Contact</h2>
+    <p>BauerHaus LLC, United States. <a href="mailto:bauer@bauerhaus.io?subject=Nexa%20privacy">bauer@bauerhaus.io</a></p>
+</main>
+
+<footer>
+    <div class="wrap">
+        <span>Copyright © 2026 BauerHaus LLC. All rights reserved.</span>
+        <span><a href="../">Nexa</a> · <a href="/">BauerHaus</a></span>
+    </div>
+</footer>
+
+</body>
+</html>
