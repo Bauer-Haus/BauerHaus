@@ -1,11 +1,11 @@
-WindowSmith
+# WindowSmith
 
 <p align="center">
 <i>Precision window management for the modern macOS workspace.</i>
 </p>
 
 
-Overview
+## Overview
 
 The Challenge: macOS offers a refined operating system, but its native window management often requires manual resizing and positioning. This can disrupt workflow and create friction, particularly for power users operating across multi-display or ultra-wide monitor setups.
 
@@ -13,7 +13,7 @@ The Solution: WindowSmith is a highly optimized, keyboard-driven window manager 
 
 Operating discreetly from the menu bar, WindowSmith is activated instantly via customizable global hotkeys. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
 
-Technical Stack
+## Technical Stack
 
 WindowSmith is built from the ground up to be lightweight, performant, and deeply integrated into the macOS ecosystem.
 
@@ -35,17 +35,17 @@ ServiceManagement: Ensures seamless "Launch at Login" functionality.
 
 Combine: Facilitates reactive state management across the application lifecycle.
 
-Engineering Challenges & Solutions
+## Engineering Challenges & Solutions
 
 Building a native macOS window manager requires interacting with deeply embedded, legacy Apple frameworks. Below is an overview of a core technical hurdle overcome during development:
 
-Challenge: Dual-Coordinate Systems & Multi-Monitor Geometry
+### Challenge: Dual-Coordinate Systems & Multi-Monitor Geometry
 
 Window manipulation on macOS requires navigating disparate coordinate systems. AppKit utilizes a bottom-left origin coordinate system (where y=0 represents the bottom of the display), whereas the macOS Accessibility API (AXUIElement) relies on a top-left origin system.
 
 When executing a command to move a window from a primary display to an external monitor of differing resolution, calculating the precise relative geometry requires translating coordinates between these inverted systems, factoring in varied pixel densities, and accounting for the physical arrangement of displays in System Settings (which dictates the global coordinate space).
 
-The Solution
+### The Solution
 
 To bypass the latency of standard AppleScript bridges, WindowSmith implements a custom, low-level geometry engine utilizing CoreGraphics and the C-based Accessibility API.
 
@@ -57,7 +57,7 @@ Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associ
 
 Result: A window manipulation engine that executes instantaneously and reliably, regardless of the target application or the complexity of the user's monitor configuration.
 
-Known Constraint: Application-Enforced Size Limits
+## Known Constraint: Application-Enforced Size Limits
 
 Some windows cannot be sized to fill their target zone exactly, and the reason lies outside any window manager's control.
 
