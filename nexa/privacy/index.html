@@ -35,10 +35,10 @@
 
 <main class="wrap">
     <h1 class="page">Nexa Privacy Policy</h1>
-    <p class="updated">Effective October 10, 2026</p>
+    <p class="updated">Effective October 10, 2026 · Updated October 11, 2026 (group chats)</p>
 
     <div class="notice">
-        <p><strong>We have no way to read or save your data.</strong> Nexa has no servers of ours and no accounts, so nothing you send ever passes through us. Your messages, files and contacts are encrypted with keys that exist only on your Mac and your contact's Mac. We can't read them, store them, recover them or hand them over to anyone, because we never have them.</p>
+        <p><strong>We have no way to read or save your data.</strong> Nexa has no servers of ours and no accounts, so nothing you send ever passes through us. Your messages, files and contacts are encrypted with keys that exist only on your Mac and the Macs of the people you talk to. We can't read them, store them, recover them or hand them over to anyone, because we never have them.</p>
     </div>
 
     <h2>In short</h2>
@@ -62,10 +62,10 @@
     <p>To deliver messages without a central server, Nexa uses public infrastructure run by independent operators. None of them are run by us, and none of them can read your messages.</p>
 
     <h3>Nostr relays (messages)</h3>
-    <p>Each message is end-to-end encrypted on your Mac and sent to public Nostr relays, which hold it until your contact's Mac picks it up. A relay sees only encrypted data of a padded size, the time it was sent, and a one-time address that changes with every message. It can't see who you are, who you are talking to, or what you said. Nexa asks relays to delete messages after 14 days by default (you can change this), but relays are run by others and may keep the encrypted data longer. You can see and change which relays are used in Settings &rsaquo; Relays, including who operates each one.</p>
+    <p>Each message is end-to-end encrypted on your Mac and sent to public Nostr relays, which hold it until your contact's Mac (or, in a group, each member's Mac) picks it up. A relay sees only encrypted data of a padded size, the time it was sent, and a one-time address that changes with every message. It can't see who you are, who you are talking to, or what you said. Nexa asks relays to delete messages after 14 days by default (you can change this), but relays are run by others and may keep the encrypted data longer. You can see and change which relays are used in Settings &rsaquo; Relays, including who operates each one. Group messages go to the relays of the person who made the group, and look exactly like private messages to the relay.</p>
 
     <h3>File servers (attachments)</h3>
-    <p>Files you send are encrypted on your Mac and uploaded in pieces to public Blossom file servers, then downloaded by your contact. The servers see only encrypted pieces of a padded size. Nexa asks the servers to delete them once they are delivered.</p>
+    <p>Files you send are encrypted on your Mac and uploaded in pieces to public Blossom file servers, then downloaded by your contact. The servers see only encrypted pieces of a padded size. Nexa asks the servers to delete them once they are delivered. In a group, a file stays on the servers until it expires, because other members may not have downloaded it yet; the sender's Nexa then asks for it to be deleted.</p>
 
     <h3>Your IP address</h3>
     <p>In <strong>Maximum privacy</strong> mode, Nexa connects through the Tor network, and relays and file servers don't see your IP address. In <strong>Standard</strong> mode, Nexa connects directly, and each relay or file server you use can see your IP address, as any website you visit can.</p>
@@ -75,6 +75,9 @@
 
     <h3>Your contacts</h3>
     <p>Your contacts receive what you send them, plus the display name you set in Settings, if any. Nobody else does: there is no directory, and nobody can find or message you without an invite link you share.</p>
+
+    <h3>Group chats</h3>
+    <p>A group has up to 10 people. You only join a group if you accept an invitation from someone you already chat with. Everyone in a group sees the list of members with their display names, and receives everything posted to the group, including your messages and files. The person who made the group decides who is in it and can remove people; anyone can leave. Group messages are end-to-end encrypted with keys only the members have, and we never see who is in a group or what is said in it.</p>
 
     <h2>Camera</h2>
     <p>Nexa uses the camera only when you choose to scan an invite or security-code QR code. Images are processed on your Mac and are never saved or sent anywhere.</p>
