@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.2 (build 17).
+Reflects WindowSmith 1.3.3 (build 18).
 
 ```mermaid
 graph TD
@@ -48,6 +48,7 @@ graph TD
         DSS["DragSnapSettings<br/>layout · trigger · enabled"]
         WL["WindowLookup<br/>window at point · coordinate flips"]
         LM["Layout Model<br/>Preset.layout · GridMerges.blocks"]
+        MATH["SnapMath<br/>placement arithmetic · plain rects in, rects out"]
         ZPM["ZoomPaletteMonitor<br/>pointer resting on a green button · saved button corners"]
         ZPS["ZoomPaletteSettings<br/>one switch · palette + Apple's menu"]
 
@@ -116,6 +117,10 @@ graph TD
     SettingsView -->|preset.layout| LM
     Grid -->|Draws the same blocks| LM
 
+    %% One placement calculation for every consumer
+    Geo -->|Zone rects · size presets · arrow-key wrap| MATH
+    DSM -->|Zone under the cursor · near-edge test| MATH
+
     %% Green-button palette
     SettingsView -->|Asks, then configures| ZPS
     ZPS -.->|Arms / disarms| ZPM
@@ -131,7 +136,7 @@ graph TD
 
     %% Assign Classes
     class App,MenuBarView,Overlay,SWM,SettingsView,Snap,Cell,Grid,Preview,Palette ui;
-    class WC,GKM,UPD,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,WL,LM,ZPM,ZPS core;
+    class WC,GKM,UPD,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,WL,LM,MATH,ZPM,ZPS core;
     class AX,WS,CG,GCD,SM,DNC,OSL,CGW,GP sys;
     class SPK,Feed net;
     class TA target;
@@ -158,6 +163,8 @@ graph TD
 **One zone decomposition.** A saved grid is rows, columns and an optional list of grouped blocks. `Preset.layout` is the only place that turns that into zones, and it does so through `GridMerges.blocks` - the same function the Custom Grid Builder draws from. The hotkey, the arrow-key cycle, drag-to-snap, both miniatures and the builder therefore cannot disagree about a layout's shape: there is one answer, not four copies of the arithmetic. Zones come out in row-major order with each group at its top-left cell, and that order is what the arrow keys walk.
 
 **Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
+
+**One placement calculation.** Hotkey snaps, arrow-key cycling, size presets and drag-to-snap all take their arithmetic from `SnapMath`: a zone's relative rect placed in a screen's visible frame, the zone under a dragged cursor, the next zone in a cycle, a size preset centred and held between 100 and 10,000 points. Hotkey snaps and drag-to-snap used to carry separate copies of the placement math, kept in step by hand; one copy means a dropped window and a hotkey-snapped window cannot land a pixel apart. Each edge is rounded to a whole point on its own, so two zones that share a divider share its pixel. The functions take plain rects rather than an `NSScreen` or a window, which is what lets the unit tests check every layout on real display sizes - uneven widths, a display at negative coordinates, a portrait display - for gaps, overlaps and dead spots without moving a window or touching the presets saved in UserDefaults.
 
 **Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and nearly all of that work is avoided outright. Every on-screen window's button corner, the top-left 100×70pt where traffic lights can sit under a tall unified toolbar, is fetched from the WindowServer and kept. Those corners cover around a percent of the screen, so almost every movement falls outside all of them and is dismissed with a few comparisons, without asking anyone anything. They are refetched at most once a second while the pointer moves, and marked stale after a click, an app switch, a Space change, or the palette itself moving a window, since that is when windows usually move. The price is that a window moved without the mouse - by a keyboard shortcut, a hotkey, an app resizing itself - can be missed for up to that second. Measured, this took the cost while the pointer moves from about 0.56% of a core to about 0.05%.
 
