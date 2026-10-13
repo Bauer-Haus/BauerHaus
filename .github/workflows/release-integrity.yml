@@ -14,11 +14,17 @@ on:
     paths:
       - "WindowSmith/appcast.xml"
       - "WindowSmith/downloads/**"
+      - "nexa/appcast.xml"
+      - "nexa/downloads/**"
+      - ".github/scripts/verify_release.py"
       - ".github/workflows/release-integrity.yml"
   pull_request:
     paths:
       - "WindowSmith/appcast.xml"
       - "WindowSmith/downloads/**"
+      - "nexa/appcast.xml"
+      - "nexa/downloads/**"
+      - ".github/scripts/verify_release.py"
       - ".github/workflows/release-integrity.yml"
   workflow_dispatch:
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Check that WindowSmith's update feed matches the builds in the repository.
+"""Check that each app's update feed matches the builds in the repository.
+
+Apps: WindowSmith (WindowSmith/appcast.xml) and Nexa (nexa/appcast.xml).
 
 For every <enclosure> in the appcast this verifies that:
 
@@ -19,12 +21,11 @@ import xml.etree.ElementTree as ET
 from urllib.parse import urlsplit
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
-APPCAST = REPO / "WindowSmith" / "appcast.xml"
-DOWNLOADS = REPO / "WindowSmith" / "downloads"
+# Each app's folder on the site: its appcast.xml, and downloads/ with the builds it lists.
+APPS = ["WindowSmith", "nexa"]
 
 SPARKLE_NS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 ALLOWED_HOSTS = {"bauerhaus.io", "www.bauerhaus.io"}
-DOWNLOAD_PREFIX = "/WindowSmith/downloads/"
 
 problems: list[str] = []
 
@@ -34,15 +35,31 @@ def fail(message: str) -> None:
 
 
 def main() -> int:
-    if not APPCAST.is_file():
-        print(f"error: {APPCAST} not found", file=sys.stderr)
+    for app in APPS:
+        check(app)
+    if problems:
+        print("\nRelease integrity check failed:", file=sys.stderr)
+        for problem in problems:
+            print(f"  - {problem}", file=sys.stderr)
         return 1
 
-    root = ET.parse(APPCAST).getroot()
+    print("\nAppcasts and builds agree.")
+    return 0
+
+
+def check(app: str) -> None:
+    appcast = REPO / app / "appcast.xml"
+    downloads = REPO / app / "downloads"
+    download_prefix = f"/{app}/downloads/"
+    if not appcast.is_file():
+        fail(f"{app}: {appcast.relative_to(REPO)} not found")
+        return
+
+    root = ET.parse(appcast).getroot()
     enclosures = root.findall(".//item/enclosure")
 
     if not enclosures:
-        fail("appcast.xml contains no <enclosure> — no update would ever install")
+        fail(f"{app}: appcast.xml contains no <enclosure> — no update would ever install")
 
     for enclosure in enclosures:
         url = enclosure.get("url", "")
@@ -54,15 +71,15 @@ def main() -> int:
             fail(f"{label}: enclosure URL is not HTTPS ({url!r})")
         if parts.hostname not in ALLOWED_HOSTS:
             fail(f"{label}: enclosure host {parts.hostname!r} is not a bauerhaus.io host")
-        if not parts.path.startswith(DOWNLOAD_PREFIX):
-            fail(f"{label}: enclosure path {parts.path!r} is outside {DOWNLOAD_PREFIX}")
+        if not parts.path.startswith(download_prefix):
+            fail(f"{label}: enclosure path {parts.path!r} is outside {download_prefix}")
 
         if not enclosure.get(f"{{{SPARKLE_NS}}}edSignature"):
             fail(f"{label}: no sparkle:edSignature — Sparkle would refuse this update")
 
-        build = DOWNLOADS / name
+        build = downloads / name
         if not name or not build.is_file():
-            fail(f"{label}: referenced by the appcast but not present in WindowSmith/downloads/")
+            fail(f"{label}: referenced by the appcast but not present in {app}/downloads/")
             continue
 
         actual_size = build.stat().st_size
@@ -74,16 +91,7 @@ def main() -> int:
         elif int(declared) != actual_size:
             fail(f"{label}: appcast says length={declared} but the file is {actual_size} bytes")
         else:
-            print(f"ok  {name}  {actual_size} bytes")
-
-    if problems:
-        print("\nRelease integrity check failed:", file=sys.stderr)
-        for problem in problems:
-            print(f"  - {problem}", file=sys.stderr)
-        return 1
-
-    print("\nAppcast and builds agree.")
-    return 0
+            print(f"ok  {app}/downloads/{name}  {actual_size} bytes")
 
 
 if __name__ == "__main__":
