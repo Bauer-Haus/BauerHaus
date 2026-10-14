@@ -3,23 +3,19 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0</title>
-            <pubDate>Tue, 13 Oct 2026 18:40:23 -0500</pubDate>
+            <title>1.0.1</title>
+            <pubDate>Tue, 13 Oct 2026 19:42:24 -0500</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>3</sparkle:version>
-            <sparkle:shortVersionString>1.0</sparkle:shortVersionString>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0</h2>
-<p>The first release of Nexa: a private messenger for the Mac with no accounts, no phone numbers and no servers of ours.</p>
+            <description><![CDATA[<h2>Nexa 1.0.1</h2>
 <ul>
-  <li>End-to-end encrypted chats, with post-quantum protection and keys that change with every message</li>
-  <li>Group chats for up to 10 people</li>
-  <li>Encrypted files up to 25 MB</li>
-  <li>Built-in Tor, with bridges for networks that block it</li>
-  <li>Disappearing messages, app lock with Touch ID, and encrypted backups</li>
+  <li>Settings &rsaquo; Privacy now has a switch for checking for updates automatically, and a Check Now button</li>
+  <li>While Nexa uses Tor, it still never checks in the background, because the check goes directly to bauerhaus.io, not through Tor</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.dmg" length="28443900" type="application/octet-stream" sparkle:edSignature="04MdKN2uppKDH2rljXKc7f9QH+LIQTthxxW98JOKSNWj2qygHqWyXGQg1WFMdF0xIWaREL5utaL2lNnMT0FMBw=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.1.dmg" length="28447483" type="application/octet-stream" sparkle:edSignature="0cy9JNlqVKejKyI11JGmAEeD9hiI0sc6jpJxxPZ9UVf7W/5eF9G7vwKIFSp03MOhaB+3s3pnJuarn2iWswFqBg=="/>
         </item>
     </channel>
 </rss>
