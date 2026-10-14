@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- GitHub Pages cannot set response headers, so the policy ships in the page.
-         Plain HTML with one stylesheet from this site: no script, nothing inline,
+         Plain HTML with one stylesheet and one image from this site: no script, nothing inline,
          nothing from another origin. This page is the Privacy Policy URL in
          App Store Connect, so it is left out of maintenance mode on purpose. -->
     <meta http-equiv="Content-Security-Policy" content="
@@ -25,15 +25,20 @@
 
 <header>
     <div class="wrap nav">
-        <a class="logo" href="/"><span class="logo-box">B</span><span>BauerHaus</span></a>
+        <div class="crumbs">
+            <a class="back" href="/">&larr; <span class="back-label">BauerHaus</span></a>
+            <span class="slash">/</span>
+            <a class="app" href="../"><img src="../icon.png" alt="" width="30" height="30">Nexa</a>
+        </div>
         <nav class="nav-links">
-            <a href="../">Nexa</a>
+            <a href="../#features">Features</a>
             <a href="../#help">Help</a>
+            <a class="pill" href="../downloads/Nexa-1.0.dmg" download>Download</a>
         </nav>
     </div>
 </header>
 
-<main class="wrap">
+<main class="wrap narrow policy">
     <h1 class="page">Nexa Privacy Policy</h1>
     <p class="updated">Effective October 10, 2026 · Updated October 13, 2026 (update checks in the version downloaded from bauerhaus.io)</p>
 
@@ -108,9 +113,16 @@
 </main>
 
 <footer>
-    <div class="wrap">
-        <span>Copyright © 2026 BauerHaus LLC. All rights reserved.</span>
-        <span><a href="../">Nexa</a> · <a href="/">BauerHaus</a></span>
+    <div class="wrap footer-grid">
+        <div class="byline"><img src="../icon.png" alt="" width="32" height="32"><span><b>Nexa</b> by BauerHaus</span></div>
+        <div class="copyright">
+            <p>Copyright © 2026 BauerHaus LLC. All rights reserved.</p>
+            <p>Designed and built in the USA. 🇺🇸</p>
+        </div>
+        <div class="footer-links">
+            <a href="../">Nexa</a>
+            <a href="/">BauerHaus</a>
+        </div>
     </div>
 </footer>
 

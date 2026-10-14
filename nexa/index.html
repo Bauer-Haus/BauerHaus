@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- GitHub Pages cannot set response headers, so the policy ships in the page.
-         This page is plain HTML with one stylesheet and one image from this site:
-         no script at all, nothing inline, nothing from another origin. -->
+         This page is plain HTML with one stylesheet and images from this site: no script at all,
+         nothing inline, nothing from another origin (no web fonts or CDNs, unlike the WindowSmith
+         page, so visiting it tells no one else who's looking at a private messenger). The popups
+         open with #links and :target, and the icons are inline SVG. -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'none';
         style-src 'self';
@@ -24,133 +26,259 @@
 
 <header>
     <div class="wrap nav">
-        <a class="logo" href="/"><span class="logo-box">B</span><span>BauerHaus</span></a>
+        <div class="crumbs">
+            <a class="back" href="/">&larr; <span class="back-label">BauerHaus</span></a>
+            <span class="slash">/</span>
+            <a class="app" href="#top"><img src="icon.png" alt="" width="30" height="30">Nexa</a>
+        </div>
         <nav class="nav-links">
-            <a href="#download">Download</a>
+            <a href="#features">Features</a>
             <a href="#help">Help</a>
-            <a href="#report">Report abuse</a>
             <a href="privacy/">Privacy</a>
+            <a class="pill" href="downloads/Nexa-1.0.dmg" download>Download</a>
         </nav>
     </div>
 </header>
 
-<main class="wrap">
-    <section class="hero">
-        <img src="icon.png" alt="Nexa app icon" width="96" height="96">
-        <div>
-            <h1>Nexa Messenger</h1>
-            <p>Private chat for the Mac. No phone number, no account, no servers of ours.</p>
-            <div class="download" id="download">
-                <a class="button" href="downloads/Nexa-1.0.dmg" download>Download for Mac</a>
-                <span>Version 1.0 · Free · macOS 26 or later</span>
+<main id="top">
+    <div class="wrap hero">
+        <div class="badge"><span class="dot"></span>Version 1.0 now available</div>
+        <h1>Private Chat<br><span class="gradient">For Your Mac.</span></h1>
+        <p class="lede">No phone number, no account, and no servers of ours. Nexa encrypts every message on your Mac and can send it through Tor, so only the person you&rsquo;re talking to ever reads it.</p>
+        <div class="actions" id="download">
+            <a class="button" href="downloads/Nexa-1.0.dmg" download><svg viewBox="0 0 384 512" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C72.7 141.9 24 184.5 24 271.5c0 25.7 4.7 52.2 14.1 79.5 12.6 35.9 58 124 105.4 122.5 24.8-.6 42.3-17.6 74.6-17.6 31.3 0 47.5 17.6 75.2 17.6 47.8-.7 88.8-80.7 100.8-116.7-64.1-30.2-60.4-88.5-60.4-90.1zm-56.6-163.5c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>Download for Mac</a>
+            <a class="button ghost" href="#start">How it works</a>
+        </div>
+        <p class="meta">Version 1.0 &middot; Free &middot; macOS 26 or later</p>
+
+        <div class="notice">
+            <p><strong>We have no way to read or save your data.</strong> There are no BauerHaus servers and no accounts. Your messages, files and contacts are encrypted with keys that exist only on your Mac and your contact&rsquo;s Mac, so we can&rsquo;t read, store, recover or hand over any of it. <a href="privacy/">Privacy policy</a></p>
+        </div>
+
+        <div class="demo" aria-label="A drawing of Nexa's window, with made-up contacts" role="img">
+            <div class="glow"></div>
+            <div class="window">
+                <div class="titlebar"><span class="light red"></span><span class="light yellow"></span><span class="light green"></span></div>
+                <div class="panes">
+                    <div class="sidebar">
+                        <div class="chat-row selected"><span class="avatar a1">M</span><div><b>Maya</b><span class="preview">See you at six then</span></div></div>
+                        <div class="chat-row"><span class="avatar a2">J</span><div><b>Jonah</b><span class="preview">Photo</span></div></div>
+                        <div class="chat-row"><span class="avatar a3">R</span><div><b>Reading group</b><span class="preview">Leo: Chapter 4 is the best one</span></div></div>
+                        <div class="chat-row"><span class="avatar a4">S</span><div><b>Sam</b><span class="preview">Thanks!</span></div></div>
+                        <div class="status">
+                            <span><span class="dot"></span>Connected to Tor</span>
+                            <span><span class="dot"></span>4 of 4 relays connected</span>
+                        </div>
+                    </div>
+                    <div class="conversation">
+                        <div class="conv-head"><span class="avatar a1">M</span><b>Maya</b><span class="verified">Verified</span></div>
+                        <div class="messages">
+                            <span class="stamp">Today 4:12 PM</span>
+                            <span class="bubble them">Are we still on for dinner tonight?</span>
+                            <span class="bubble me">Yes! Same place as last time?</span>
+                            <span class="bubble them">Perfect. I&rsquo;ll book a table.</span>
+                            <span class="bubble me">See you at six then</span>
+                        </div>
+                        <div class="composer">Message</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="features">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Private by Design</h2>
+                <p>Everything that keeps your conversations private happens on your Mac. There&rsquo;s no company in the middle to trust.</p>
+            </div>
+            <div class="cards four">
+                <div class="card">
+                    <div class="icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+                    <h3>End-to-end encrypted</h3>
+                    <p>Messages and files are encrypted on your Mac with keys that change after every message, plus post-quantum protection. Only the person you write to can read them.</p>
+                </div>
+                <div class="card">
+                    <div class="icon slate"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div>
+                    <h3>No account, no phone number</h3>
+                    <p>There is nothing to sign up for. You connect with someone by sharing a one-time invite link or QR code, and compare a security code to be sure it&rsquo;s them.</p>
+                </div>
+                <div class="card">
+                    <div class="icon sky"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4 4 7 7 7 11a7 7 0 0 1-14 0c0-4 3-7 7-11z"/><path d="M12 8c2 2 3.5 4 3.5 6a3.5 3.5 0 0 1-7 0c0-2 1.5-4 3.5-6z"/></svg></div>
+                    <h3>Built-in Tor</h3>
+                    <p>Maximum privacy sends everything through Tor, so relays never learn your IP address. If your network blocks Tor, Nexa can switch to a bridge on its own.</p>
+                </div>
+                <div class="card">
+                    <div class="icon green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l10 10h4"/><path d="M3 17h4l3-3"/><path d="M14 10l3-3h4"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/></svg></div>
+                    <h3>Nothing to link together</h3>
+                    <p>Every message goes to a fresh address only the two of you can compute, so nobody watching the relays can tell which messages belong to the same chat.</p>
+                </div>
+                <div class="card">
+                    <div class="icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 5.5 5"/></svg></div>
+                    <h3>Group chats</h3>
+                    <p>Up to 10 people, each message signed by its sender and encrypted like a private chat, with new keys whenever someone joins or leaves.</p>
+                </div>
+                <div class="card">
+                    <div class="icon slate"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
+                    <h3>Backups only you can open</h3>
+                    <p>Move Nexa to a new Mac with an encrypted backup and a recovery code. We never see the code, so nobody else can open the file.</p>
+                </div>
+                <div class="card">
+                    <div class="icon sky"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11a5 5 0 0 1 10 0v2"/><path d="M12 11v4a6 6 0 0 1-1.5 4"/><path d="M4.5 9a8 8 0 0 1 15 0"/><path d="M8.5 15a10 10 0 0 1-.5 4"/><path d="M16 17a14 14 0 0 1-.6 3"/></svg></div>
+                    <h3>App lock with Touch ID</h3>
+                    <p>An optional passphrase and Touch ID, and Nexa locks itself when your Mac sleeps or the screen locks.</p>
+                </div>
+                <div class="card">
+                    <div class="icon green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 9 6 9 6a16 16 0 0 1-2.4 3"/><path d="M6.6 7.6C4.3 9.2 3 12 3 12s4 6 9 6a8.6 8.6 0 0 0 4-1"/></svg></div>
+                    <h3>Nothing to hand over</h3>
+                    <p>Messages travel through public relays run by different people in different countries. We never see them, so we have nothing to share.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <div class="notice">
-        <p><strong>We have no way to read or save your data.</strong> There are no BauerHaus servers and no accounts. Your messages, files and contacts are encrypted with keys that exist only on your Mac and your contact's Mac, so we can't read, store, recover or hand over any of it. <a href="privacy/">Privacy policy</a></p>
-    </div>
-
-    <div class="cards">
-        <div class="card">
-            <h3>End-to-end encrypted</h3>
-            <p>Messages and files are encrypted on your Mac, with keys that change after every message, and post-quantum protection.</p>
+    <section id="start" class="ruled">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Talking in a Minute</h2>
+                <p>No sign-up and no phone number. This is the whole setup.</p>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="icon step blue">1</div>
+                    <h3>Install</h3>
+                    <p>Open the downloaded file and drag <strong>Nexa</strong> into your Applications folder.</p>
+                </div>
+                <div class="card">
+                    <div class="icon step sky">2</div>
+                    <h3>Choose your privacy</h3>
+                    <p>Pick <strong>Maximum privacy</strong> (built-in Tor, hides your IP address) or <strong>Standard</strong> (faster). You can change it later in Settings &rsaquo; Network.</p>
+                </div>
+                <div class="card">
+                    <div class="icon step green">3</div>
+                    <h3>Send an invite</h3>
+                    <p>Click <strong>New Chat</strong> &rsaquo; <strong>Create Invite Link</strong> and send it, or let them scan the QR code. They open it with <strong>New Chat</strong> &rsaquo; <strong>Use Invite Link&hellip;</strong>, and the chat connects as soon as either of you is online.</p>
+                    <p class="small">For the strongest protection, compare the <strong>security code</strong> (Verify, at the top of the chat) in person or on a call you trust.</p>
+                </div>
+            </div>
+            <ul class="facts">
+                <li>macOS 26 or later</li>
+                <li>Apple silicon &amp; Intel</li>
+                <li>Signed &amp; notarized by Apple</li>
+                <li>28 MB</li>
+                <li>Free updates</li>
+            </ul>
         </div>
-        <div class="card">
-            <h3>No accounts</h3>
-            <p>There is nothing to sign up for. You connect with someone by sharing a one-time invite link.</p>
+    </section>
+
+    <section id="help" class="ruled">
+        <div class="wrap narrow help">
+            <h2>Questions</h2>
+
+        <details>
+            <summary>How do I get updates?</summary>
+            <p>Nexa checks bauerhaus.io for new versions and asks before installing one. It asks your permission before checking for the first time, and you can always check yourself with <strong>Nexa</strong> &rsaquo; <strong>Check for Updates…</strong>. Every update is signed by us, and Nexa refuses one that isn't.</p>
+        </details>
+
+        <details>
+            <summary>Is the download safe?</summary>
+            <p>Nexa is signed by BauerHaus LLC and notarized by Apple, so macOS checks it before it opens. Your chats stay on your Mac, and keep working when Nexa is on the Mac App Store.</p>
+        </details>
+
+        <details>
+            <summary>Is an invite link safe to send by email or text?</summary>
+            <p>Yes. Each link works once and expires. If someone intercepted it and used it first, your contact's chat wouldn't connect, and comparing security codes shows anyone who tried to sit in the middle.</p>
+        </details>
+
+        <details>
+            <summary>How do I move Nexa to a new Mac?</summary>
+            <p>Settings &rsaquo; Backup &rsaquo; <strong>Move to Backup…</strong> writes an encrypted backup file and gives you a recovery code. Nexa then erases itself from this Mac. On the new Mac, choose <strong>Restore from a Backup…</strong> on the welcome screen and enter the code. Your chats continue where they left off.</p>
+        </details>
+
+        <details>
+            <summary>I lost my recovery code. Can you restore my backup?</summary>
+            <p>No. The code is the only key to the backup, and we never see it. Without it, nobody can open the file, including us. Write it on paper and keep it somewhere safe; don't keep it in a note or screenshot on the same Mac.</p>
+        </details>
+
+        <details>
+            <summary>Maximum privacy or Standard?</summary>
+            <p>Both encrypt everything you send. Maximum privacy also routes Nexa through Tor, so relays and file servers never learn your IP address, and each contact uses a separate Tor circuit. It is a little slower to connect. Standard connects directly with encrypted DNS and is faster, but relays can see your IP address.</p>
+        </details>
+
+        <details>
+            <summary>A message says "Sending" for a long time.</summary>
+            <p>Nexa keeps trying until a relay accepts the message, including after a restart. If it lasts more than a few minutes, check your internet connection, or try the other network mode in Settings &rsaquo; Network. Settings &rsaquo; Relays shows which relays are working.</p>
+        </details>
+
+        <details>
+            <summary>Can I lock Nexa with Touch ID?</summary>
+            <p>Yes. Settings &rsaquo; Security lets you set a passphrase and then unlock with Touch ID. Nexa locks when your Mac sleeps or the screen locks.</p>
+        </details>
+
+        <details>
+            <summary>How do group chats work?</summary>
+            <p>Click <strong>New Chat</strong> &rsaquo; <strong>New Group…</strong>, name it, and pick up to 9 people you already chat with; each of them is asked first. Everyone in the group sees the member list and what's posted, and messages are end-to-end encrypted like any other chat. The person who made the group adds and removes people; anyone can leave. To be sure the messages under someone's name are really theirs, compare their member code (in the group's member list) with them in person.</p>
+        </details>
+
+        <details>
+            <summary>How long do relays keep my messages?</summary>
+            <p>Nexa asks relays to delete messages after 14 days by default (adjustable in Settings). Relays are run by other people and may keep them longer, but they only ever hold encrypted data they can't read. Disappearing messages, set per chat, also delete messages from both Macs.</p>
+        </details>
+
+        <h2 id="report">Report abuse</h2>
+        <p>Nobody can message you on Nexa unless you share an invite link with them. If someone you connected with is abusive:</p>
+        <ul>
+            <li><strong>Block them:</strong> open the chat, click the <strong>…</strong> button at the top right, and choose <strong>Block</strong>. Nexa stops receiving anything from them.</li>
+            <li><strong>Report them:</strong> in the same menu, choose <strong>Report…</strong>. You choose which of their messages to include, and Nexa writes an email to us that you can review before sending.</li>
+            <li><strong>In a group:</strong> click the members button at the top of the group, then the <strong>…</strong> next to the person, to block or report them. Leave the group from the group's <strong>…</strong> menu.</li>
+            <li>Or email <a href="mailto:bauer@bauerhaus.io?subject=Nexa%20report">bauer@bauerhaus.io</a> directly.</li>
+        </ul>
+        <p>We read and answer every report. Because there is no central service, we can't read chats or remove other people from Nexa, but we will help you protect yourself and act on anything that involves a risk to someone's safety.</p>
+
+        <h2>Contact</h2>
+        <p>Questions, problems or feedback: <a href="mailto:bauer@bauerhaus.io?subject=Nexa">bauer@bauerhaus.io</a>. Security issues: see our <a href="https://github.com/Bauer-Haus/BauerHaus/blob/main/SECURITY.md">security policy</a>.</p>
+
+
+            <div class="notice">
+                <p>Nexa is also coming to the Mac App Store. Until then, <a href="downloads/Nexa-1.0.dmg" download>download it here</a>.</p>
+            </div>
         </div>
-        <div class="card">
-            <h3>Nothing to hand over</h3>
-            <p>Messages travel through public relays that can't read them. We never see them, so we have nothing to share.</p>
-        </div>
-    </div>
-
-    <h2 id="help">Getting started</h2>
-    <ol>
-        <li>Open the downloaded file and drag <strong>Nexa</strong> into your Applications folder.</li>
-        <li>Open Nexa and choose <strong>Maximum privacy</strong> (built-in Tor, hides your IP address) or <strong>Standard</strong> (faster). You can change this later in Settings &rsaquo; Network.</li>
-        <li>Click <strong>New Chat</strong> &rsaquo; <strong>Create Invite Link</strong>, and send the link to the person you want to talk to, or let them scan the QR code.</li>
-        <li>They open the link in Nexa (<strong>New Chat</strong> &rsaquo; <strong>Use Invite Link…</strong>). The chat connects as soon as either of you is online.</li>
-        <li>For the strongest protection, compare the <strong>security code</strong> (Verify, at the top of the chat) in person or on a call you trust.</li>
-    </ol>
-
-    <h2>Questions</h2>
-
-    <details>
-        <summary>How do I get updates?</summary>
-        <p>Nexa checks bauerhaus.io for new versions and asks before installing one. It asks your permission before checking for the first time, and you can always check yourself with <strong>Nexa</strong> &rsaquo; <strong>Check for Updates…</strong>. Every update is signed by us, and Nexa refuses one that isn't.</p>
-    </details>
-
-    <details>
-        <summary>Is the download safe?</summary>
-        <p>Nexa is signed by BauerHaus LLC and notarized by Apple, so macOS checks it before it opens. Your chats stay on your Mac, and keep working when Nexa is on the Mac App Store.</p>
-    </details>
-
-    <details>
-        <summary>Is an invite link safe to send by email or text?</summary>
-        <p>Yes. Each link works once and expires. If someone intercepted it and used it first, your contact's chat wouldn't connect, and comparing security codes shows anyone who tried to sit in the middle.</p>
-    </details>
-
-    <details>
-        <summary>How do I move Nexa to a new Mac?</summary>
-        <p>Settings &rsaquo; Backup &rsaquo; <strong>Move to Backup…</strong> writes an encrypted backup file and gives you a recovery code. Nexa then erases itself from this Mac. On the new Mac, choose <strong>Restore from a Backup…</strong> on the welcome screen and enter the code. Your chats continue where they left off.</p>
-    </details>
-
-    <details>
-        <summary>I lost my recovery code. Can you restore my backup?</summary>
-        <p>No. The code is the only key to the backup, and we never see it. Without it, nobody can open the file, including us. Write it on paper and keep it somewhere safe; don't keep it in a note or screenshot on the same Mac.</p>
-    </details>
-
-    <details>
-        <summary>Maximum privacy or Standard?</summary>
-        <p>Both encrypt everything you send. Maximum privacy also routes Nexa through Tor, so relays and file servers never learn your IP address, and each contact uses a separate Tor circuit. It is a little slower to connect. Standard connects directly with encrypted DNS and is faster, but relays can see your IP address.</p>
-    </details>
-
-    <details>
-        <summary>A message says "Sending" for a long time.</summary>
-        <p>Nexa keeps trying until a relay accepts the message, including after a restart. If it lasts more than a few minutes, check your internet connection, or try the other network mode in Settings &rsaquo; Network. Settings &rsaquo; Relays shows which relays are working.</p>
-    </details>
-
-    <details>
-        <summary>Can I lock Nexa with Touch ID?</summary>
-        <p>Yes. Settings &rsaquo; Security lets you set a passphrase and then unlock with Touch ID. Nexa locks when your Mac sleeps or the screen locks.</p>
-    </details>
-
-    <details>
-        <summary>How do group chats work?</summary>
-        <p>Click <strong>New Chat</strong> &rsaquo; <strong>New Group…</strong>, name it, and pick up to 9 people you already chat with; each of them is asked first. Everyone in the group sees the member list and what's posted, and messages are end-to-end encrypted like any other chat. The person who made the group adds and removes people; anyone can leave. To be sure the messages under someone's name are really theirs, compare their member code (in the group's member list) with them in person.</p>
-    </details>
-
-    <details>
-        <summary>How long do relays keep my messages?</summary>
-        <p>Nexa asks relays to delete messages after 14 days by default (adjustable in Settings). Relays are run by other people and may keep them longer, but they only ever hold encrypted data they can't read. Disappearing messages, set per chat, also delete messages from both Macs.</p>
-    </details>
-
-    <h2 id="report">Report abuse</h2>
-    <p>Nobody can message you on Nexa unless you share an invite link with them. If someone you connected with is abusive:</p>
-    <ul>
-        <li><strong>Block them:</strong> open the chat, click the <strong>…</strong> button at the top right, and choose <strong>Block</strong>. Nexa stops receiving anything from them.</li>
-        <li><strong>Report them:</strong> in the same menu, choose <strong>Report…</strong>. You choose which of their messages to include, and Nexa writes an email to us that you can review before sending.</li>
-        <li><strong>In a group:</strong> click the members button at the top of the group, then the <strong>…</strong> next to the person, to block or report them. Leave the group from the group's <strong>…</strong> menu.</li>
-        <li>Or email <a href="mailto:bauer@bauerhaus.io?subject=Nexa%20report">bauer@bauerhaus.io</a> directly.</li>
-    </ul>
-    <p>We read and answer every report. Because there is no central service, we can't read chats or remove other people from Nexa, but we will help you protect yourself and act on anything that involves a risk to someone's safety.</p>
-
-    <h2>Contact</h2>
-    <p>Questions, problems or feedback: <a href="mailto:bauer@bauerhaus.io?subject=Nexa">bauer@bauerhaus.io</a>. Security issues: see our <a href="https://github.com/Bauer-Haus/BauerHaus/blob/main/SECURITY.md">security policy</a>.</p>
-
-    <div class="notice">
-        <p>Nexa is also coming to the Mac App Store. Until then, <a href="downloads/Nexa-1.0.dmg" download>download it here</a>.</p>
-    </div>
+    </section>
 </main>
 
 <footer>
-    <div class="wrap">
-        <span>Copyright © 2026 BauerHaus LLC. All rights reserved.</span>
-        <span><a href="privacy/">Nexa Privacy Policy</a> · <a href="/">BauerHaus</a></span>
+    <div class="wrap footer-grid">
+        <div class="byline"><img src="icon.png" alt="" width="32" height="32"><span><b>Nexa</b> by BauerHaus</span></div>
+        <div class="copyright">
+            <p>Copyright © 2026 BauerHaus LLC. All rights reserved.</p>
+            <p>Designed and built in the USA. 🇺🇸</p>
+        </div>
+        <div class="footer-links">
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <a href="privacy/">Privacy Policy</a>
+        </div>
     </div>
 </footer>
+
+<div id="about" class="modal">
+    <a class="modal-backdrop" href="#_" aria-label="Close"></a>
+    <div class="modal-content">
+        <a class="close" href="#_" aria-label="Close">&times;</a>
+        <h2>About BauerHaus.</h2>
+        <p>We build high-quality, native utilities designed exclusively for macOS. Our mission is to create software that feels right at home on your machine: fast, efficient, and crafted with pure Swift.</p>
+    </div>
+</div>
+
+<div id="contact" class="modal">
+    <a class="modal-backdrop" href="#_" aria-label="Close"></a>
+    <div class="modal-content">
+        <a class="close" href="#_" aria-label="Close">&times;</a>
+        <h2>Get in Touch.</h2>
+        <p>Questions, problems or feedback about Nexa? We&rsquo;d love to hear from you. For security issues, see our <a href="https://github.com/Bauer-Haus/BauerHaus/blob/main/SECURITY.md">security policy</a>.</p>
+        <a class="mail" href="mailto:bauer@bauerhaus.io?subject=Nexa">bauer@bauerhaus.io &rarr;</a>
+    </div>
+</div>
 
 </body>
 </html>
