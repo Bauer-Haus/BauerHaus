@@ -9,9 +9,9 @@
 
 The Challenge: macOS offers a refined operating system, but its native window management often requires manual resizing and positioning. This can disrupt workflow and create friction, particularly for power users operating across multi-display or ultra-wide monitor setups.
 
-The Solution: WindowSmith is a highly optimized, keyboard-driven window manager and layout utility built natively for macOS. Designed for developers, designers, and multitaskers, it enables instant window snapping into precise grid layouts (Halves, Thirds, Quadrants, or Custom Grids), seamless cross-display window routing, and exact pixel-perfect sizing.
+The Solution: WindowSmith is a highly optimized, keyboard-driven window manager and layout utility built natively for macOS. Designed for developers, designers, and multitaskers, it enables instant window snapping into precise grid layouts (Halves, Thirds, Quadrants, or Custom Grids whose cells can be grouped into larger zones), seamless cross-display window routing, and exact pixel-perfect sizing.
 
-Operating discreetly from the menu bar, WindowSmith is activated instantly via customizable global hotkeys. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
+Operating discreetly from the menu bar, WindowSmith is driven by customizable global hotkeys, by dragging a window onto a live zone preview, or by an optional Quick Snap palette on every window's green button. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
 
 ## Technical Stack
 
@@ -21,9 +21,9 @@ Language: Swift 5+
 
 UI Frameworks:
 
-SwiftUI: Leveraged for modern, reactive, and fluid interfaces within the Menu Bar popover and Settings modules.
+SwiftUI: Leveraged for modern, reactive, and fluid interfaces within the menu bar window, the Quick Snap palette, and Settings.
 
-AppKit: Manages low-level window lifecycle events, NSPopover interactions, and global event monitoring.
+AppKit: Manages low-level window lifecycle events, the non-activating Quick Snap panel and click-through drag preview, and global event monitoring.
 
 Core APIs & Frameworks:
 
@@ -34,6 +34,8 @@ CoreGraphics: Utilized for processing complex multi-monitor bounds, frame calcul
 ServiceManagement: Ensures seamless "Launch at Login" functionality.
 
 Combine: Facilitates reactive state management across the application lifecycle.
+
+Sparkle 2: Delivers automatic updates, each verified against an EdDSA signature before it installs.
 
 ## Engineering Challenges & Solutions
 
@@ -53,7 +55,7 @@ Coordinate Normalization: The engine dynamically queries NSScreen.screens to map
 
 Inversion & Injection: Prior to injecting the new coordinates via AXUIElementSetAttributeValue, the engine intercepts the height of the primary screen and mathematically inverts the Y-axis.
 
-Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associated with resizing heavy applications (e.g., Xcode or web browsers), sizing and positioning commands are dispatched asynchronously on a background userInteractive queue. This utilizes a micro-sleep (usleep) buffer, allowing the target application's internal UI thread to synchronize before applying the final coordinate snap.
+Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associated with resizing heavy applications (e.g., Xcode or web browsers), keyboard-triggered sizing and positioning commands are dispatched asynchronously on a background userInteractive queue. This utilizes a micro-sleep (usleep) buffer, allowing the target application's internal UI thread to synchronize before applying the final coordinate snap.
 
 Result: A window manipulation engine that executes instantaneously and reliably, regardless of the target application or the complexity of the user's monitor configuration.
 
@@ -63,7 +65,7 @@ Some windows cannot be sized to fill their target zone exactly, and the reason l
 
 Every macOS application declares its own minimum and maximum window dimensions, and the Accessibility API is not permitted to override them. When a window is asked to occupy a zone smaller than its declared minimum, the application clamps the request and settles at the nearest size it will accept. Windows marked as non-resizable decline the request entirely. This is enforced by the target application itself, not by WindowSmith, and it applies equally to Apple's own apps and to third-party software — utility windows, dialogs, and Electron-based applications tend to carry the most generous minimums.
 
-WindowSmith applies the requested geometry regardless, so the outcome stays predictable rather than arbitrary: the window is aligned to the top edge of its target zone and centred horizontally within it, then constrained to remain fully on-screen. A window that refuses to shrink therefore sits exactly where the layout intends, simply occupying more room than the zone allocates. Surrounding windows are unaffected and keep their assigned zones.
+WindowSmith applies the requested geometry regardless, so the outcome stays predictable rather than arbitrary: the window's top-left corner is placed on the top-left corner of its target zone, and whatever room the application refuses to give up extends to the right of and below the zone from there. A window that refuses to shrink therefore starts exactly where the layout intends, simply occupying more room than the zone allocates; in the right-most zone of a layout, that extra width can run past the edge of the screen. Surrounding windows are unaffected and keep their assigned zones.
 
 Display size determines how often this occurs. A zone is a fraction of the display it divides, so the smaller the screen and the more zones a layout defines, the likelier any single zone falls below some application's minimum. A three-column layout on a 13-inch built-in display allocates each zone roughly 490 points of width, which is narrower than many applications accept; the identical layout on a 27-inch external display leaves every zone with room to spare. If windows in a dense layout are not sizing as expected, selecting a layout with fewer zones generally resolves it.
 
