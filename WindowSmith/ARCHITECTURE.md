@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.3 (build 18).
+Reflects WindowSmith 1.3.4 (build 19).
 
 ```mermaid
 graph TD
@@ -36,7 +36,7 @@ graph TD
     subgraph Core ["Core Engine (Swift)"]
         WC["WindowController<br/>singleton · ObservableObject"]
         GKM["GlobalKeyMonitor<br/>local + global keyDown"]
-        UPD["UpdaterController<br/>wraps SPUStandardUpdaterController"]
+        UPD["UpdaterController<br/>wraps SPUStandardUpdaterController · automatic-check switch"]
 
         subgraph WC_Logic ["WindowController Internals"]
             Geo["Geometry Engine<br/>relative rects · throw"]
@@ -81,6 +81,7 @@ graph TD
     SettingsView -->|Saves Presets & Hotkeys| WC
     Overlay -->|Grant Access| Perm
     MenuBarView -->|Check for Updates| UPD
+    SettingsView -->|Automatic checks on / off| UPD
     WC <-->|Combine @Published Updates| MenuBarView
     WC <-->|Persists / Loads| UD
     WC -->|Toggles| SM
@@ -175,5 +176,7 @@ Inside a saved corner the checks run from cheap to costly. The WindowServer name
 **Replacing Apple's menu.** Apple's green-button menu is controlled by one system-wide preference, `NSZoomButtonShowMenu` in the global domain. The palette's switch owns it: on writes `false`, off removes it, so the palette and Apple's menu are never both switched on or both off. Because that reaches every app on the Mac, turning the switch on asks first, and the preference is written only when the switch is flipped, never at launch. Apps read it only when they start, so windows already open keep Apple's menu until their app is reopened.
 
 **Release integrity.** Automatic updates are protected by Sparkle, which refuses any build whose EdDSA signature does not verify against the key baked into the app. The manual download is protected by Apple: the DMG and the app inside it are signed with a Developer ID and notarized, with the ticket stapled, so Gatekeeper will not open one that was altered after it was built. No checksum is published on top of that. A workflow on the site checks every push that each appcast enclosure is HTTPS, signed, present in the repo and the length it claims, so a release that does not line up fails there instead of reaching users.
+
+**Update checks the user controls.** WindowSmith's only network traffic is Sparkle asking the appcast whether a newer version exists, once a day (`SUScheduledCheckInterval`, pinned in Info.plist so the Settings caption stays true). Sparkle asks permission before the first scheduled check, and Settings has a switch for it afterwards. The switch reads and writes Sparkle's own `automaticallyChecksForUpdates`, which Sparkle persists and reschedules on, so there is no second copy of the setting to drift; it follows the answer to the permission prompt, and flipping it counts as that answer. With it off, the network is contacted only when the user chooses Check for Updates.
 
 **Asynchronous injection.** Keyboard snaps and size presets are dispatched on a background `userInteractive` queue with a short `usleep` buffer between the size and position writes, allowing the target application's UI thread to settle before the final coordinate snap. Drag-to-snap and the green-button palette already hold the exact window to move, so they write its size and position directly, twice and 10ms apart, giving an application that clamps to a minimum size a moment to reflow before the second pass.
