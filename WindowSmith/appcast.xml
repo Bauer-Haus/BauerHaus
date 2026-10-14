@@ -3,19 +3,18 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.3.3</title>
-            <pubDate>Mon, 12 Oct 2026 09:23:47 -0500</pubDate>
+            <title>1.3.4</title>
+            <pubDate>Tue, 13 Oct 2026 19:45:33 -0500</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>18</sparkle:version>
-            <sparkle:shortVersionString>1.3.3</sparkle:shortVersionString>
+            <sparkle:version>19</sparkle:version>
+            <sparkle:shortVersionString>1.3.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Snapping, made sturdier</h2>
+            <description><![CDATA[<h2>Your choice on update checks</h2>
 <ul>
-  <li>Keyboard shortcuts, the arrow keys, drag-to-snap and size presets now place windows with one shared calculation, so a window lands in exactly the same spot whichever way you snap it.</li>
-  <li>That calculation is now checked automatically on many screen sizes, including ultrawide, portrait and second displays, for gaps or overlaps between windows.</li>
+  <li>New in Settings: <strong>Check for updates automatically</strong>. Turn it off and WindowSmith never contacts the network unless you choose Check for Updates from the menu.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.3.dmg" length="7619221" type="application/octet-stream" sparkle:edSignature="G/H4COqt864VoCOGbCsFcGQOW1xA0+C/DfAvfHLn4ptpEof0EEi0xA3qZWbTXrdtPbCb28CsuH+oMk4KG3FFDg=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.4.dmg" length="7622298" type="application/octet-stream" sparkle:edSignature="5ayox1hjhUNYB1a+T2tcpRe3o5xvQsfYSM6TGwsojr4PlIRI78hVZExcNs2Qf3QO1zVbIEgNOkcl5hoqhc93CQ=="/>
         </item>
     </channel>
 </rss>
