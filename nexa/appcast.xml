@@ -3,19 +3,18 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.1</title>
-            <pubDate>Tue, 13 Oct 2026 19:42:24 -0500</pubDate>
+            <title>1.0.2</title>
+            <pubDate>Sat, 17 Oct 2026 22:09:14 -0500</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>4</sparkle:version>
-            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.1</h2>
+            <description><![CDATA[<h2>Nexa 1.0.2</h2>
 <ul>
-  <li>Settings &rsaquo; Privacy now has a switch for checking for updates automatically, and a Check Now button</li>
-  <li>While Nexa uses Tor, it still never checks in the background, because the check goes directly to bauerhaus.io, not through Tor</li>
+  <li>Fixes a crash: a relay could close Nexa by sending it one malformed message. Nothing could be read or changed this way, but it could keep Nexa from staying open. Found by new automated fuzz testing.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.1.dmg" length="28447483" type="application/octet-stream" sparkle:edSignature="0cy9JNlqVKejKyI11JGmAEeD9hiI0sc6jpJxxPZ9UVf7W/5eF9G7vwKIFSp03MOhaB+3s3pnJuarn2iWswFqBg=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.2.dmg" length="28526039" type="application/octet-stream" sparkle:edSignature="FOeOAVP2rSWMZCu41ZY5+M4XMj2HMmtKjTHaJKixAzWGMwGk3T1eq8ohYPVOvzRfGAGqnZTOgfl+mQi/4T8RBA=="/>
         </item>
     </channel>
 </rss>
