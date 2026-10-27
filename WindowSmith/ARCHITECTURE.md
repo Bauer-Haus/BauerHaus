@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.5 (build 20).
+Reflects WindowSmith 1.3.6 (build 21).
 
 ```mermaid
 graph TD
@@ -31,6 +31,7 @@ graph TD
         SWM -->|hosts| SettingsView
         SettingsView -->|renders| Grid
         Palette -->|renders| Snap
+    Palette -->|Saved grids · first 8| LM
     end
 
     subgraph Core ["Core Engine (Swift)"]
@@ -161,7 +162,7 @@ graph TD
 
 **A preview that survives a long sleep.** The preview window is created once and reused, and it joins every Space. After a long lid-closed sleep the Mac wakes from Deep Idle, treats the display as new hardware and rebuilds its Spaces, and a hidden window can come out of that belonging to none: ordering it front then reports success and shows nothing, indefinitely. So a hidden preview window is discarded on wake and on any display change, and every time it is shown it is asked whether it actually landed on the active Space; if not, it is replaced on the spot.
 
-**One zone decomposition.** A saved grid is rows, columns and an optional list of grouped blocks. `Preset.layout` is the only place that turns that into zones, and it does so through `GridMerges.blocks` - the same function the Custom Grid Builder draws from. The hotkey, the arrow-key cycle, drag-to-snap, both miniatures and the builder therefore cannot disagree about a layout's shape: there is one answer, not four copies of the arithmetic. Zones come out in row-major order with each group at its top-left cell, and that order is what the arrow keys walk.
+**One zone decomposition.** A saved grid is rows, columns and an optional list of grouped blocks. `Preset.layout` is the only place that turns that into zones, and it does so through `GridMerges.blocks` - the same function the Custom Grid Builder draws from. The hotkey, the arrow-key cycle, drag-to-snap, both miniatures, the green-button palette and the builder therefore cannot disagree about a layout's shape: there is one answer, not a copy of the arithmetic for each. Zones come out in row-major order with each group at its top-left cell, and that order is what the arrow keys walk.
 
 **Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
 
@@ -170,6 +171,8 @@ graph TD
 **Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and nearly all of that work is avoided outright. Every on-screen window's button corner, the top-left 100×70pt where traffic lights can sit under a tall unified toolbar, is fetched from the WindowServer and kept. Those corners cover around a percent of the screen, so almost every movement falls outside all of them and is dismissed with a few comparisons, without asking anyone anything. They are refetched at most once a second while the pointer moves, and marked stale after a click, an app switch, a Space change, or the palette itself moving a window, since that is when windows usually move. The price is that a window moved without the mouse - by a keyboard shortcut, a hotkey, an app resizing itself - can be missed for up to that second. Measured, this took the cost while the pointer moves from about 0.56% of a core to about 0.05%.
 
 Inside a saved corner the checks run from cheap to costly. The WindowServer names the single window under the pointer, which measured about three times faster than copying the full window list and does not grow with the number of windows open; only if the pointer is in that window's own corner is the app asked through Accessibility what is there. A green button reports the subrole `AXFullScreenButton`, or `AXZoomButton` in a window that can only zoom. That query is capped at a 0.1s timeout and at most one every 60ms. Throttling must not drop the moment of arrival, though: a resting pointer sends no more events, so a movement that lands inside the 60ms window schedules one look at wherever the pointer ends up, and a corner with no answer is retried every 0.1s for up to a second. Nothing runs while the pointer is still, and nothing at all while the feature is off.
+
+**Saved grids beside the built-ins.** Below the eight built-in layouts the palette offers up to eight of the user's saved grids, in the order of the Presets list, each named because custom grids look alike at that size. They come from `Preset.layout` like every other consumer, so a click moves the hovered window through the same path as a built-in. Size presets are left out: a size is not a place and has no zones. Eight is two rows, which takes the palette from 165pt to 361pt tall; any more and it would stop being glanceable, and a palette that tall still fits above or below a window on a 13-inch display. Presets are read each time the palette opens, so a newly saved grid is offered on the next hover.
 
 **A palette that does not take focus.** The palette is a non-activating `NSPanel`, so choosing a zone leaves the app being arranged in front with its keyboard focus, and its hosting view accepts the first click, since a panel that never becomes key would otherwise spend that click on focusing itself. The chosen zone is applied to the window whose button was hovered, not to whatever is frontmost, which is what lets it arrange a background window. And for the same reason the drag preview needs rebuilding after a long sleep, the panel is not reused at all: it is built on every open and discarded on close. On macOS 26 and later it sits on `NSGlassEffectView`, the Liquid Glass Apple uses for its own green-button menu, with the same 18pt corners. That class does not exist on earlier systems, so it is weak-linked and checked with `#available`: macOS 13 through 15 launch normally and draw the frosted popover material instead.
 
