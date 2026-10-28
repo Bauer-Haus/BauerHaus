@@ -50,7 +50,12 @@
            full-width column instead of a page that scrolls sideways. */
         #main-content { display: none; width: 100%; max-width: 1400px; grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr)); gap: 20px; }
         .cam-container { border: 1px solid #2a2a2a; padding: 10px; background: #1a1a1a; }
-        h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; margin-bottom: 10px; margin-top: 0; }
+        h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; margin-bottom: 10px; margin-top: 0; }
+        .live { display: inline-flex; align-items: center; gap: 6px; color: #ff3b3b; }
+        .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff3b3b; animation: pulse 1.6s ease-in-out infinite; }
+        @keyframes pulse { 50% { opacity: 0.25; } }
+        @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+        .clock { color: #8a8a8a; }
         iframe, video:not(.vjs-tech) { display: block; width: 100%; aspect-ratio: 16/9; border: none; background: #000; }
     </style>
 </head>
@@ -80,13 +85,57 @@
         // browser. That is what stops a copy-pasted `javascript:` URL, or a
         // title with markup in it, from turning this page into an XSS.
         const myCameras = [
-            { title: "Newport Beach Pier", type: "iframe", url: "https://g1.ipcamlive.com/player/player.php?alias=blackiessurfcam2&autoplay=1" },
-            { title: "Big Sky", type: "youtube", url: "dMr-Jt_K3Cc" },
-            { title: "Key West Harbor", type: "youtube", url: "iHJbTrQSZys" },
-            { title: "NYC Skyline & East River", type: "youtube", url: "obqnslJKrxc" }
+            { title: "Newport Beach Pier", tz: "America/Los_Angeles", type: "iframe", url: "https://g1.ipcamlive.com/player/player.php?alias=blackiessurfcam2&autoplay=1" },
+            { title: "Big Sky", tz: "America/Denver", type: "youtube", url: "dMr-Jt_K3Cc" },
+            { title: "Key West Harbor", tz: "America/New_York", type: "youtube", url: "iHJbTrQSZys" },
+            { title: "NYC Skyline & East River", tz: "America/New_York", type: "youtube", url: "obqnslJKrxc" }
         ];
 
         // --- 2. THE ENGINE ---
+
+        // Each heading shows the camera's local time. tz is an IANA time zone
+        // name like "America/New_York"; a cam without one, or with a name the
+        // browser doesn't know, just shows no clock.
+        const clocks = [];
+
+        function clockFormatter(tz) {
+            if (!tz) return null;
+            try {
+                return new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+            } catch (err) {
+                console.warn("Unknown time zone, skipping clock:", tz);
+                return null;
+            }
+        }
+
+        function tickClocks() {
+            const now = new Date();
+            clocks.forEach(({ el, format }) => { el.textContent = format.format(now); });
+        }
+
+        function makeHeading(cam) {
+            const heading = document.createElement("h2");
+
+            const live = document.createElement("span");
+            live.className = "live";
+            const dot = document.createElement("span");
+            dot.className = "live-dot";
+            live.append(dot, "LIVE");
+
+            const name = document.createElement("span");
+            name.textContent = cam.title;
+
+            heading.append(live, name);
+
+            const format = clockFormatter(cam.tz);
+            if (format) {
+                const clock = document.createElement("span");
+                clock.className = "clock";
+                heading.append(clock);
+                clocks.push({ el: clock, format });
+            }
+            return heading;
+        }
 
         // A YouTube video ID, and nothing that could be read as anything else.
         const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
@@ -104,7 +153,6 @@
             const frame = document.createElement("iframe");
             frame.src = src;
             frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
-            frame.allowFullscreen = true;
             frame.loading = "lazy";
             frame.referrerPolicy = referrerPolicy;
             return frame;
@@ -170,10 +218,9 @@
                 const camDiv = document.createElement('div');
                 camDiv.className = 'cam-container';
 
-                // textContent, not innerHTML: a camera title is treated as text,
-                // never as markup.
-                const heading = document.createElement('h2');
-                heading.textContent = `Live Feed ${index + 1} - ${cam.title}`;
+                // Built from text nodes, never innerHTML: a camera title is
+                // treated as text, not markup.
+                const heading = makeHeading(cam);
 
                 camDiv.appendChild(heading);
                 camDiv.appendChild(player);
@@ -198,6 +245,9 @@
                     }
                 }
             });
+
+            tickClocks();
+            setInterval(tickClocks, 15000);
 
             document.getElementById('gatekeeper').style.display = 'none';
             container.style.display = 'grid';
