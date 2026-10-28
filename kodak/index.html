@@ -21,10 +21,10 @@
         style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
         font-src 'self' data:;
         img-src 'self' data:;
-        media-src blob: https://usw01-smr05-relay.ozolio.com;
-        connect-src 'self' https://usw01-smr05-relay.ozolio.com;
+        media-src blob:;
+        connect-src 'self';
         worker-src blob:;
-        frame-src https://www.youtube-nocookie.com https://g1.ipcamlive.com;
+        frame-src https://www.youtube-nocookie.com https://*.ipcamlive.com;
         object-src 'none';
         base-uri 'none';
         form-action 'none';
@@ -41,16 +41,28 @@
     <style>
         body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         #gatekeeper { margin-top: 100px; text-align: center; letter-spacing: 2px; }
-        #main-content { display: none; width: 100%; max-width: 1400px; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        #gate-form { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+        #gate-form input, #gate-form button { font: inherit; letter-spacing: 2px; padding: 10px 12px; background: #1a1a1a; color: #e0e0e0; border: 1px solid #2a2a2a; }
+        #gate-form input { width: 180px; font-size: 16px; } /* 16px stops iOS zooming in on focus */
+        #gate-form button { cursor: pointer; }
+        #gate-error { color: #ff5555; min-height: 1em; }
+        /* min(450px, 100%) lets a cell shrink below 450px, so phones get one
+           full-width column instead of a page that scrolls sideways. */
+        #main-content { display: none; width: 100%; max-width: 1400px; grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr)); gap: 20px; }
         .cam-container { border: 1px solid #2a2a2a; padding: 10px; background: #1a1a1a; }
         h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; margin-bottom: 10px; margin-top: 0; }
-        .video-js, iframe { width: 100% !important; height: auto !important; aspect-ratio: 16/9; border: none; }
+        iframe, video:not(.vjs-tech) { display: block; width: 100%; aspect-ratio: 16/9; border: none; background: #000; }
     </style>
 </head>
 <body>
 
     <div id="gatekeeper">
         <p>SECURE ACCESS REQUIRED</p>
+        <form id="gate-form" autocomplete="off">
+            <input id="gate-input" type="password" aria-label="Password" autofocus>
+            <button type="submit">ENTER</button>
+        </form>
+        <p id="gate-error" role="alert"></p>
     </div>
 
     <div id="main-content"></div>
@@ -70,7 +82,7 @@
         const myCameras = [
             { title: "Newport Beach Pier", type: "iframe", url: "https://g1.ipcamlive.com/player/player.php?alias=blackiessurfcam2&autoplay=1" },
             { title: "Big Sky", type: "youtube", url: "dMr-Jt_K3Cc" },
-            { title: "Key West", type: "hls", url: "https://usw01-smr05-relay.ozolio.com/hls-live/_definst_/relay01.odjvdrc.fd0.sm1.av2.mt0.at0.as0.dv0.sh2.rt19793.rc0.edge.basic.stream/playlist.m3u8" }
+            { title: "Key West Harbor", type: "youtube", url: "iHJbTrQSZys" }
         ];
 
         // --- 2. THE ENGINE ---
@@ -87,14 +99,13 @@
             }
         }
 
-        function makeFrame(src) {
+        function makeFrame(src, referrerPolicy) {
             const frame = document.createElement("iframe");
             frame.src = src;
             frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
             frame.allowFullscreen = true;
             frame.loading = "lazy";
-            // Don't tell the embed which page it is sitting on.
-            frame.referrerPolicy = "no-referrer";
+            frame.referrerPolicy = referrerPolicy;
             return frame;
         }
 
@@ -105,8 +116,14 @@
                     return null;
                 }
                 // youtube-nocookie keeps YouTube from setting tracking cookies on
-                // visitors who never press play.
-                return makeFrame("https://www.youtube-nocookie.com/embed/" + cam.url + "?mute=1");
+                // visitors who never press play. YouTube refuses to play an embed
+                // that sends no referrer (Error 153), so this one sends the
+                // site's origin - never the path. Browsers only allow autoplay
+                // when muted, hence mute=1.
+                return makeFrame(
+                    "https://www.youtube-nocookie.com/embed/" + cam.url + "?autoplay=1&mute=1&playsinline=1",
+                    "strict-origin-when-cross-origin"
+                );
             }
 
             const src = httpsUrlOrNull(cam.url);
@@ -116,7 +133,8 @@
             }
 
             if (cam.type === "iframe") {
-                return makeFrame(src);
+                // Don't tell other embeds which page they are sitting on.
+                return makeFrame(src, "no-referrer");
             }
 
             // HLS Video.js Engine
@@ -125,6 +143,11 @@
             video.className = "video-js vjs-default-skin";
             video.controls = true;
             video.preload = "auto";
+            // Muted autoplay is the only autoplay browsers allow, and without
+            // playsinline an iPhone takes the video fullscreen.
+            video.setAttribute("muted", "");
+            video.setAttribute("autoplay", "");
+            video.setAttribute("playsinline", "");
 
             const source = document.createElement("source");
             source.src = src;
@@ -165,7 +188,7 @@
                 if (cam.type === "hls") {
                     try {
                         if (typeof videojs === "function") {
-                            videojs(`cam${index}`);
+                            videojs(`cam${index}`, { fluid: true, aspectRatio: "16:9", autoplay: "muted", liveui: true });
                         } else {
                             console.warn("video.js unavailable; leaving native playback for:", cam.title);
                         }
@@ -190,16 +213,25 @@
         // enforced somewhere the visitor cannot see: an authenticating proxy in
         // front of the page (Cloudflare Access and Netlify's password protection
         // both do this for static sites), not a check that runs in the browser.
-        (function() {
-            const input = prompt("Enter Password:");
-            const accessCode = input ? input.trim().toLowerCase() : "";
 
-            if (accessCode === "livecam") {
+        // A form rather than prompt(): Cancel on a prompt left the page stuck
+        // with no way to try again, and a typo threw you off the site.
+        const PASSWORD = "livecam";
+        const gateForm = document.getElementById("gate-form");
+        const gateInput = document.getElementById("gate-input");
+        const gateError = document.getElementById("gate-error");
+
+        gateForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (gateInput.value.trim().toLowerCase() === PASSWORD) {
+                gateInput.blur();
                 loadDashboard();
-            } else if (input !== null) {
-                window.location.href = "https://bauerhaus.io";
+            } else {
+                gateError.textContent = "ACCESS DENIED";
+                gateInput.value = "";
+                gateInput.focus();
             }
-        })();
+        });
     </script>
 </body>
 </html>
