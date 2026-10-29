@@ -3,18 +3,20 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.3.6</title>
-            <pubDate>Mon, 26 Oct 2026 20:42:07 -0500</pubDate>
+            <title>1.3.7</title>
+            <pubDate>Thu, 29 Oct 2026 13:28:41 -0500</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>21</sparkle:version>
-            <sparkle:shortVersionString>1.3.6</sparkle:shortVersionString>
+            <sparkle:version>22</sparkle:version>
+            <sparkle:shortVersionString>1.3.7</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Your layouts on the green button</h2>
+            <description><![CDATA[<h2>A quicker green button</h2>
 <ul>
-  <li>Quick Snap on the green button now shows your saved grids too, in a new My Layouts section under the built-in layouts. Up to eight appear, in the order of your Presets list.</li>
+  <li>Quick Snap on the green button opens a little sooner when you rest the pointer on it, while still waiting long enough that passing over the button doesn't open it.</li>
+  <li>Choosing a layout now closes the palette instantly, without waiting for the window to finish moving.</li>
+  <li>Busy apps, such as Xcode while it's building, now reliably move when you choose a layout from the green button or drag a window to snap it.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.6.dmg" length="7633610" type="application/octet-stream" sparkle:edSignature="Y7/IxpD1wLKMICKWu/5LIhwgyiBJCHH7YGkn5F981OI36JyiExzNoI1hi/Zw3PsyrDshS35x/pj8O0RydeJGAA=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.7.dmg" length="7624449" type="application/octet-stream" sparkle:edSignature="MemCwrY8rEbcAZIZs67cpao7Sr5B10a7uy+juOUA1E4MWboFMSPO3hbie67wPy986/qxCpdDQEa5/HCesWyvBA=="/>
         </item>
     </channel>
 </rss>
