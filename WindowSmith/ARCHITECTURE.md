@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.8 (build 23).
+Reflects WindowSmith 1.3.9 (build 24).
 
 ```mermaid
 graph TD
@@ -53,7 +53,7 @@ graph TD
         ZPM["ZoomPaletteMonitor<br/>pointer resting on a green button · saved button corners"]
         ZPS["ZoomPaletteSettings<br/>one switch · palette + Apple's menu"]
 
-        UD[("UserDefaults<br/>presets · hotkeys · drag-snap · green button · prompt flag")]
+        UD[("UserDefaults<br/>presets · hotkeys · drag-snap · green button · block visibility · prompt flag")]
     end
 
     subgraph MacOS ["macOS System APIs"]
@@ -163,6 +163,8 @@ graph TD
 **A preview that survives a long sleep.** The preview window is created once and reused, and it joins every Space. After a long lid-closed sleep the Mac wakes from Deep Idle, treats the display as new hardware and rebuilds its Spaces, and a hidden window can come out of that belonging to none: ordering it front then reports success and shows nothing, indefinitely. So a hidden preview window is discarded on wake and on any display change, and every time it is shown it is asked whether it actually landed on the active Space; if not, it is replaced on the spot.
 
 **One zone decomposition.** A saved grid is rows, columns and an optional list of grouped blocks. `Preset.layout` is the only place that turns that into zones, and it does so through `GridMerges.blocks` - the same function the Custom Grid Builder draws from. The hotkey, the arrow-key cycle, drag-to-snap, both miniatures, the green-button palette and the builder therefore cannot disagree about a layout's shape: there is one answer, not a copy of the arithmetic for each. Zones come out in row-major order with each group at its top-left cell, and that order is what the arrow keys walk.
+
+**One setting for how the blocks look.** Every miniature is the same `SnapLayoutView`, so how strongly its blocks stand out is decided in one place. Block visibility in Settings offers Less, Normal and More: Less is the system separator color every version before 1.3.8 used, while Normal (the default) and More fill with the text color at 22% and 32% in dark mode, 13% and 16% in light. The choice is saved in UserDefaults and each miniature reads it through `@AppStorage`, so changing it redraws the menu bar, the green-button palette and Settings at once, with nothing to pass between them. A saved value it does not recognise reads as Normal.
 
 **Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
 
