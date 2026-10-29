@@ -3,18 +3,19 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.3.8</title>
-            <pubDate>Thu, 29 Oct 2026 13:48:39 -0500</pubDate>
+            <title>1.3.9</title>
+            <pubDate>Thu, 29 Oct 2026 17:20:53 -0500</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>23</sparkle:version>
-            <sparkle:shortVersionString>1.3.8</sparkle:shortVersionString>
+            <sparkle:version>24</sparkle:version>
+            <sparkle:shortVersionString>1.3.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Easier-to-see layouts</h2>
+            <description><![CDATA[<h2>Choose how the layouts look</h2>
 <ul>
-  <li>The layout blocks in the menu bar, on the green button and in Settings are now more solid, so they stand out clearly against the glass even over a busy wallpaper, in both light and dark mode.</li>
+  <li>A new Block visibility setting lets you choose how strongly the layout blocks stand out: Less, Normal or More. Less is the look from earlier versions, and More is the bolder look from 1.3.8. Normal, in between, is the default.</li>
+  <li>The change applies everywhere at once: the menu bar, Quick Snap on the green button, and Settings.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.8.dmg" length="7277210" type="application/octet-stream" sparkle:edSignature="3jxtHVqMWvuLCaxMXgmeXjsxHS5xEkISujVumIQNtKcyXH5ND1yAwJbK5RD5RFLaL5dbs6+OZaUDmhJ7pEKCAA=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.9.dmg" length="7286426" type="application/octet-stream" sparkle:edSignature="h3aKMV7KfLaNGdQ/583h8+hkvzzmp6NINx/z3rrongksebCHQvIGubb44dKca8CgQPdC/SVceF0TGezaJUk/Dg=="/>
         </item>
     </channel>
 </rss>
