@@ -3,22 +3,19 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.3</title>
-            <pubDate>Fri, 30 Oct 2026 07:33:44 -0500</pubDate>
+            <title>1.0.4</title>
+            <pubDate>Fri, 30 Oct 2026 15:33:13 -0500</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.3</h2>
+            <description><![CDATA[<h2>Nexa 1.0.4</h2>
 <ul>
-  <li>Chats recover on their own after messages go missing: if the relays lose up to 15 messages in a row from one person, Nexa still finds the ones that come after them. Before, losing 6 in a row could leave one side of a chat silent for good.</li>
-  <li>Group posts no longer go missing when a group's new key arrives later than a newer one.</li>
-  <li>A group's creator can invite someone again if the first invitation was lost.</li>
-  <li>An old "left" or "declined" message that arrives late no longer cancels someone's new membership or invitation.</li>
+  <li>Security updates for the built-in Tor: newer versions of the libraries it uses to decompress network data and to check certificates when connecting through Snowflake, and a fix for a timing leak in one of its encryption helpers.</li>
 </ul>
-<p>Found by new long-running automated tests that play out thousands of conversations with lost, delayed and reordered messages.</p>
+<p>Nothing changes in how Nexa looks or works.</p>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.3.dmg" length="28603237" type="application/octet-stream" sparkle:edSignature="IIHjD32//1bhU8tkdE5Xo7buIQz0f/HfHbVIgSSJprVRcXY3kcsdP01v32a8IC/AN326DpBo0c2UQQnPF/n5CA=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.4.dmg" length="28602770" type="application/octet-stream" sparkle:edSignature="LZVk3UESSQ/wpB6GUThq+HABetc5qjdLWZ/odnffz0A59QNGSwTdO0k9yoabzfxEc4B1YMlJCWoWy3Q/7LyRDQ=="/>
         </item>
     </channel>
 </rss>
