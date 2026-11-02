@@ -3,22 +3,20 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.5</title>
-            <pubDate>Sat, 31 Oct 2026 08:04:53 -0500</pubDate>
+            <title>1.0.6</title>
+            <pubDate>Mon, 02 Nov 2026 12:45:53 -0600</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>8</sparkle:version>
-            <sparkle:shortVersionString>1.0.5</sparkle:shortVersionString>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.5</h2>
+            <description><![CDATA[<h2>Nexa 1.0.6</h2>
 <ul>
-  <li>The sidebar opens and closes cleanly: its buttons no longer disappear into a "»" menu for a moment, and it no longer opens halfway and then jumps.</li>
-  <li>The Tor status at the bottom of the chat list stays on one or two lines while Tor connects, instead of wrapping and jumping.</li>
-  <li>Short group chats sit at the bottom of the window, like one-to-one chats.</li>
-  <li>"Check for Updates" under a message that needs a newer Nexa now checks bauerhaus.io instead of opening the App Store.</li>
-  <li>Smaller fixes: group invitations and the Add People sheet read properly when lists are empty, file server details always open in Settings ▸ Relays, "Copied" turns back into "Copy Link", and a failed change to disappearing messages says so.</li>
+  <li>Much faster with many chats and long histories: catching up on messages that arrived while Nexa was closed takes seconds instead of up to a minute.</li>
+  <li>The window opens right away and shows a spinner while your chats load, instead of appearing only once everything is ready.</li>
+  <li>The chat list draws faster, and saving uses far less work per message, so Nexa stays responsive while messages come in.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.5.dmg" length="28599094" type="application/octet-stream" sparkle:edSignature="QgfCRo/Sdn++L363d1ObTLVzXRH/pO0xWPozTPJ9Byz51sPzVbfpham0fUrFeco42BvXzndbm9+BTTipIsQQCg=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.6.dmg" length="28674637" type="application/octet-stream" sparkle:edSignature="LgX7JKjudGmnQ3CaZCbgiZevf/Lvb4J2G3RPXcyfPFQ+vqGTUGppN+LlQh3UDEqXXFopv3vOoGFo2bKqhO0XBg=="/>
         </item>
     </channel>
 </rss>
