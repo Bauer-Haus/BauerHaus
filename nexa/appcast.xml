@@ -3,20 +3,21 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.6</title>
-            <pubDate>Mon, 02 Nov 2026 12:45:53 -0600</pubDate>
+            <title>1.0.7</title>
+            <pubDate>Tue, 03 Nov 2026 20:17:53 -0600</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>9</sparkle:version>
-            <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.6</h2>
+            <description><![CDATA[<h2>Nexa 1.0.7</h2>
 <ul>
-  <li>Much faster with many chats and long histories: catching up on messages that arrived while Nexa was closed takes seconds instead of up to a minute.</li>
-  <li>The window opens right away and shows a spinner while your chats load, instead of appearing only once everything is ready.</li>
-  <li>The chat list draws faster, and saving uses far less work per message, so Nexa stays responsive while messages come in.</li>
+  <li>The chat list keeps a sensible width: it opens wide enough to read names, and can no longer be dragged so wide that the chat gets squeezed and its buttons disappear into a "»" menu.</li>
+  <li>Showing the sidebar again no longer makes the window wider each time.</li>
+  <li>Nexa remembers its window size and chat list width after updates.</li>
+  <li>Fixed a rare crash in how chats are saved.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.6.dmg" length="28674637" type="application/octet-stream" sparkle:edSignature="LgX7JKjudGmnQ3CaZCbgiZevf/Lvb4J2G3RPXcyfPFQ+vqGTUGppN+LlQh3UDEqXXFopv3vOoGFo2bKqhO0XBg=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.7.dmg" length="28670419" type="application/octet-stream" sparkle:edSignature="KC/xb2ArEGAAx5el47UXibkdsrC5AuYVdOxNVaDr4NcHYynsO06KKcBYoqay4I3DXc53RcmT2HEC7Yix8XMsBQ=="/>
         </item>
     </channel>
 </rss>
