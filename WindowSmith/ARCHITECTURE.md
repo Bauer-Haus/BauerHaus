@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.9 (build 24).
+Reflects WindowSmith 1.3.10 (build 25).
 
 ```mermaid
 graph TD
@@ -157,6 +157,8 @@ graph TD
 **Two disagreeing answers to "where is this window".** A title-bar drag is carried out by the WindowServer, not by the application — which is why a hung app's window can still be dragged. The Accessibility API asks the *owning application* for its position, so during a drag it returns a stale value and then jumps, measured at roughly 105ms behind the cursor across repeated drags. `CGWindowList` asks the WindowServer instead and tracks the cursor essentially 1:1. Drag detection therefore reads the WindowServer, which also cannot be stalled by an unresponsive app the way synchronous Accessibility IPC into that app's run loop can. The two sources are checked for agreement at mouse-down, and detection falls back to Accessibility if they disagree, so a mismatch can never move the wrong window.
 
 **Distinguishing a window drag from a drag inside a window.** Nothing announces that a window drag has begun, so a candidate window is captured on mouse-down and promoted only once its frame actually moves while its size holds steady — a changed size means a resize handle, not a title bar. Cursor distance cannot make this call: the reported position lags far behind the pointer before catching up, so "the cursor moved but the window has not" describes an ordinary drag just as well as a text selection. Only elapsed time separates them, and nothing is drawn before the gesture is confirmed, so waiting costs a few extra probes and no visible latency.
+
+**Desktop widgets are not windows to snap.** Widgets on the desktop belong to Notification Center and sit far below the normal window layer (around -2147483601, against 0 for app windows). The WindowServer lookup at mouse-down only accepts layer-0 windows, so it skips a widget, but the Accessibility fallback answers with the widget's window like any other, and dragging a widget really does move that window. Before 1.3.10 that made a widget pass as a window drag and get snapped on release. Mouse-down now asks the WindowServer which window is topmost under the pointer, and if it sits below the normal layer (a widget, a desktop icon, the wallpaper) the press is ignored outright. Floating windows above layer 0 are unaffected.
 
 **A preview that cannot swallow its own gesture.** The zone preview is a borderless, transparent `NSWindow` above the normal window level. It sits directly under the cursor for the entire drag, so it sets `ignoresMouseEvents` — without that it would consume the very drag it exists to illustrate.
 
