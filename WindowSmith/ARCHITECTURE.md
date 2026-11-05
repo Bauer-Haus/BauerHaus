@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.3.10 (build 25).
+Reflects WindowSmith 1.4.0 (build 26).
 
 ```mermaid
 graph TD
@@ -16,11 +16,12 @@ graph TD
         MenuBarView["MenuBarView"]
         Overlay["PermissionOverlay"]
         SWM["SettingsWindowManager<br/>NSWindow + NSHostingController"]
-        SettingsView["SettingsView"]
+        SettingsView["SettingsView<br/>General · Shortcuts · Mouse · My Layouts tabs"]
         Snap["SnapLayoutView"]
         Cell["PresetCell"]
         Grid["GridBuilderView<br/>cell selection · grouping"]
         Preview["SnapPreviewOverlay<br/>borderless · click-through NSWindow"]
+        Guides["EdgeGuideOverlay<br/>click-through · full screen · lit zone"]
         Palette["ZoomPalettePanel<br/>non-activating NSPanel · Liquid Glass · rebuilt per open"]
 
         App -->|hosts| MenuBarView
@@ -36,8 +37,9 @@ graph TD
 
     subgraph Core ["Core Engine (Swift)"]
         WC["WindowController<br/>singleton · ObservableObject"]
-        GKM["GlobalKeyMonitor<br/>local + global keyDown"]
-        UPD["UpdaterController<br/>wraps SPUStandardUpdaterController · automatic-check switch"]
+        HK["HotKeys<br/>Carbon RegisterEventHotKey · exclusive"]
+        UPD["UpdaterController<br/>wraps SPUStandardUpdaterController · automatic-check switch · relaunch watcher"]
+        RM["RestoreMemory<br/>each window's frame before WindowSmith moved it"]
 
         subgraph WC_Logic ["WindowController Internals"]
             Geo["Geometry Engine<br/>relative rects · throw"]
@@ -46,14 +48,16 @@ graph TD
         end
 
         DSM["DragSnapMonitor<br/>global mouse monitors · drag detection"]
-        DSS["DragSnapSettings<br/>layout · trigger · enabled"]
+        DSS["DragSnapSettings<br/>mode · layout · trigger · enabled · first-launch defaults"]
+        ES["EdgeSnap<br/>edge and corner zones · guide shapes"]
+        AT["AppleTiling<br/>reads macOS's own tiling settings"]
         WL["WindowLookup<br/>window at point · coordinate flips"]
         LM["Layout Model<br/>Preset.layout · GridMerges.blocks"]
         MATH["SnapMath<br/>placement arithmetic · plain rects in, rects out"]
         ZPM["ZoomPaletteMonitor<br/>pointer resting on a green button · saved button corners"]
-        ZPS["ZoomPaletteSettings<br/>one switch · palette + Apple's menu"]
+        ZPS["ZoomPaletteSettings<br/>one switch · palette + Apple's menu · restored on quit"]
 
-        UD[("UserDefaults<br/>presets · hotkeys · drag-snap · green button · block visibility · prompt flag")]
+        UD[("UserDefaults<br/>presets · hotkeys · drag-snap · green button · block visibility · settings tab · prompt flag")]
     end
 
     subgraph MacOS ["macOS System APIs"]
@@ -66,6 +70,8 @@ graph TD
         DNC["DistributedNotificationCenter<br/>com.apple.accessibility.api"]
         OSL["OSLog"]
         GP["Global preferences<br/>NSZoomButtonShowMenu"]
+        WMP["com.apple.WindowManager<br/>EnableTilingByEdgeDrag · EnableTopTilingByEdgeDrag"]
+        CEV["Carbon Event Manager<br/>hot keys · input source changes"]
     end
 
     subgraph Updates ["Update Channel"]
@@ -88,13 +94,15 @@ graph TD
     WC -->|Toggles| SM
 
     %% Core internals
-    GKM == "Intercepts Ctrl+Opt+1-4 / Arrows" ==> WC
+    CEV == "Ctrl+Opt 1-4 · arrows · C · Delete" ==> HK
+    HK == "Layout · cycle / throw · center · restore" ==> WC
+    WC -->|Frame before and after each move| RM
     WC --> Geo
     WC --> Cycle
     WC --> Perm
     WC --> OSL
     DNC -.->|AX trust changed| Perm
-    Perm -.->|Re-arms monitors on grant| GKM
+    Perm -.->|Starts mouse watchers on grant| DSM
 
     %% Core to OS
     WC -->|Queries Frontmost PID| WS
@@ -110,6 +118,12 @@ graph TD
     WL -->|Live frame during a drag · window under the pointer| CGW
     WL -->|Element to move · green button · fallback frame| AX
     DSM -->|Previews the target zone| Preview
+    DSM -->|Screen edges mode: zone under the pointer| ES
+    DSM -->|Shows and lights the edges| Guides
+    DSM -->|Dragging a snapped window away: original size| RM
+    MenuBarView -->|Warns when on| AT
+    SettingsView -->|Warns when on| AT
+    AT -->|Reads, never writes| WMP
     DSM == "Applies the drop to that exact window" ==> WC
     WS -.->|Wake · display change: rebuild| Preview
 
@@ -134,12 +148,13 @@ graph TD
 
     %% Updates
     UPD --> SPK
+    UPD -.->|Update relaunch: keep Apple's menu hidden| ZPS
     SPK -.->|Polls & verifies signature| Feed
 
     %% Assign Classes
-    class App,MenuBarView,Overlay,SWM,SettingsView,Snap,Cell,Grid,Preview,Palette ui;
-    class WC,GKM,UPD,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,WL,LM,MATH,ZPM,ZPS core;
-    class AX,WS,CG,GCD,SM,DNC,OSL,CGW,GP sys;
+    class App,MenuBarView,Overlay,SWM,SettingsView,Snap,Cell,Grid,Preview,Guides,Palette ui;
+    class WC,HK,UPD,RM,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,ES,AT,WL,LM,MATH,ZPM,ZPS core;
+    class AX,WS,CG,GCD,SM,DNC,OSL,CGW,GP,WMP,CEV sys;
     class SPK,Feed net;
     class TA target;
 ```
@@ -150,9 +165,7 @@ graph TD
 
 **Permission detection without polling the user.** A menu bar app never receives `didBecomeActive` when the user flips the Accessibility switch in System Settings, so trust changes arrive two ways: an observer on the `com.apple.accessibility.api` distributed notification, plus a 1-second timer that runs only while untrusted and invalidates itself on grant. The timer is scheduled in `.common` run loop mode so it keeps firing while the menu bar popover is open.
 
-**Re-arming the key monitors.** Global `NSEvent` monitors installed before Accessibility is granted never receive `keyDown` and do not begin working retroactively, so the grant transition tears them down and reinstalls them.
-
-**Modifier normalization.** Arrow keys set `.function` and `.numericPad` alongside the real modifiers, and caps lock can be latched, so all three are stripped before matching the `Ctrl+Opt` chord. Digits are read from `charactersIgnoringModifiers`, since Option remaps the printable character.
+**Shortcuts that belong to WindowSmith.** Since 1.4.0 the shortcuts are Carbon hot keys (`RegisterEventHotKey` with `kEventHotKeyExclusive`), not a global `NSEvent` monitor. A global monitor only listens: the key press still reached the app in front, so ⌃⌥1 could also type into it. A hot key is consumed, and it needs no Accessibility permission to be heard, so the grant no longer has to re-arm anything. Each action is registered by key code with `controlKey | optionKey` - 1-4 on both the number row and the keypad, the arrows, C and Delete - so the modifier and caps-lock clean-up the old monitor needed is gone. C is looked up through `UCKeyTranslate` in the keyboard layout in use, so Center follows the key marked C on any layout, and every key is registered again when the input source changes. If another app already holds a combination, registration fails for that key alone; an action counts as unavailable only if none of its keys could be had, and Settings marks it.
 
 **Two disagreeing answers to "where is this window".** A title-bar drag is carried out by the WindowServer, not by the application — which is why a hung app's window can still be dragged. The Accessibility API asks the *owning application* for its position, so during a drag it returns a stale value and then jumps, measured at roughly 105ms behind the cursor across repeated drags. `CGWindowList` asks the WindowServer instead and tracks the cursor essentially 1:1. Drag detection therefore reads the WindowServer, which also cannot be stalled by an unresponsive app the way synchronous Accessibility IPC into that app's run loop can. The two sources are checked for agreement at mouse-down, and detection falls back to Accessibility if they disagree, so a mismatch can never move the wrong window.
 
@@ -170,6 +183,14 @@ graph TD
 
 **Groups stay on the grid.** A group is stored as integer grid coordinates, never as a fraction of the screen, so every edge it has is a k/rows or k/cols line - the same lines the ungrouped cells sit on. Built-in layouts follow the same rule: Bias is exactly two thirds rather than 0.66, which had left a 23px strip between a Bias window and a Thirds window on an ultrawide. Stored groups are clamped to the grid before use, since shrinking the builder under a group would otherwise leave a hole in the layout - and a hole shows up only as drag-to-snap declining to preview over it.
 
+**Screen edges.** Drag to Snap has two modes: Layout, where a Quick Snap layout's zones are the targets, and Screen edges, where `EdgeSnap` maps the pointer against the visible frame - a corner gives a quarter, a side a half, the top the whole screen and the bottom the third under the pointer; on a portrait display the sides give stacked thirds and the bottom the lower half. Edges are 16pt strips measured from the visible frame, not the full screen, so the bottom zones sit above the Dock rather than behind it, and a corner reaches 10% of the shorter side, clamped to 60-160pt. There is no two-thirds slide: it turned fast window moves into accidental snaps. While a drag is under way `EdgeGuideOverlay`, a click-through full-screen window like the preview, draws one rounded bar per zone along the edges and lights the one under the pointer; a corner's two bars are one shape, so it reads as a single L. Holding ⌘ hides the guides with the snapping. A new install starts with drag to snap on in this mode, since it leaves ordinary window moves alone; anyone upgrading keeps what they had. A first launch is recognised by none of the settings earlier versions write being present, and the choice is written down at once so the next launch does not mistake it for an upgrade.
+
+**Leaving Apple's tiling alone.** macOS 15 tiles windows dragged to an edge itself, which fights both drag modes. WindowSmith only reads `EnableTilingByEdgeDrag` and `EnableTopTilingByEdgeDrag` in `com.apple.WindowManager` (missing means on) and, when drag to snap is on, warns in the menu and in Settings with a button that opens Desktop & Dock. It never writes them: they are Apple's settings, and the switch is one click away.
+
+**Restore.** `RestoreMemory` keeps, for each window WindowSmith moves, the frame it had before WindowSmith first touched it, matched by `CFEqual` on the `AXUIElement` and capped at 64 windows. Moving an already-moved window again keeps that first frame, provided the window is still where WindowSmith put it; if the user has moved it since, the new starting point replaces it. Restore Window (⌃⌥⌫ or the menu) puts the front window back and forgets it. With drag to snap on, dragging a snapped window away does the same for its size: once the drag is confirmed the window takes its original size back, keeping the grab point under the pointer, in proportion across the width and at the same distance from the top. The record lives only in memory, since a window's identity does not outlast the app that owns it.
+
+**Center.** Center Window (⌃⌥C or the menu) moves the front window to the middle of its screen's visible frame without resizing it, through `SnapMath.centredOrigin`, rounded to whole points; a window larger than the visible frame starts at its top-left corner instead. It is recorded like any other move, so Restore undoes it.
+
 **One placement calculation.** Hotkey snaps, arrow-key cycling, size presets and drag-to-snap all take their arithmetic from `SnapMath`: a zone's relative rect placed in a screen's visible frame, the zone under a dragged cursor, the next zone in a cycle, a size preset centred and held between 100 and 10,000 points. Hotkey snaps and drag-to-snap used to carry separate copies of the placement math, kept in step by hand; one copy means a dropped window and a hotkey-snapped window cannot land a pixel apart. Each edge is rounded to a whole point on its own, so two zones that share a divider share its pixel. The functions take plain rects rather than an `NSScreen` or a window, which is what lets the unit tests check every layout on real display sizes - uneven widths, a display at negative coordinates, a portrait display - for gaps, overlaps and dead spots without moving a window or touching the presets saved in UserDefaults.
 
 **Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and nearly all of that work is avoided outright. Every on-screen window's button corner, the top-left 100×70pt where traffic lights can sit under a tall unified toolbar, is fetched from the WindowServer and kept. Those corners cover around a percent of the screen, so almost every movement falls outside all of them and is dismissed with a few comparisons, without asking anyone anything. They are refetched at most once a second while the pointer moves, and marked stale after a click, an app switch, a Space change, or the palette itself moving a window, since that is when windows usually move. The price is that a window moved without the mouse - by a keyboard shortcut, a hotkey, an app resizing itself - can be missed for up to that second. Measured, this took the cost while the pointer moves from about 0.56% of a core to about 0.05%.
@@ -180,7 +201,7 @@ Inside a saved corner the checks run from cheap to costly. The WindowServer name
 
 **A palette that does not take focus.** The palette is a non-activating `NSPanel`, so choosing a zone leaves the app being arranged in front with its keyboard focus, and its hosting view accepts the first click, since a panel that never becomes key would otherwise spend that click on focusing itself. The chosen zone is applied to the window whose button was hovered, not to whatever is frontmost, which is what lets it arrange a background window. And for the same reason the drag preview needs rebuilding after a long sleep, the panel is not reused at all: it is built on every open and discarded on close. On macOS 26 and later it sits on `NSGlassEffectView`, the Liquid Glass Apple uses for its own green-button menu, with the same 18pt corners. That class does not exist on earlier systems, so it is weak-linked and checked with `#available`: macOS 13 through 15 launch normally and draw the frosted popover material instead.
 
-**Replacing Apple's menu.** Apple's green-button menu is controlled by one system-wide preference, `NSZoomButtonShowMenu` in the global domain. The palette's switch owns it: on writes `false`, off removes it, so the palette and Apple's menu are never both switched on or both off. Because that reaches every app on the Mac, turning the switch on asks first, and the preference is written only when the switch is flipped, never at launch. Apps read it only when they start, so windows already open keep Apple's menu until their app is reopened.
+**Replacing Apple's menu.** Apple's green-button menu is controlled by one system-wide preference, `NSZoomButtonShowMenu` in the global domain. The palette's switch owns it: on writes `false`, off removes it, so the palette and Apple's menu are never both switched on or both off. Because that reaches every app on the Mac, turning the switch on asks first. Since 1.4.0 Apple's menu is hidden only while WindowSmith is running to replace it: quitting removes the preference, and the next launch writes `false` again if the switch is on and it is not already `false`, so a launch where nothing changed writes nothing. Two quits leave it hidden because WindowSmith is about to return: a log-out, restart or shut-down (`NSWorkspace.willPowerOffNotification`) with Launch at Login on, and Sparkle's install-and-relaunch, which its updater delegate reports. A crash or force quit runs no code; the next launch puts things right. Apps read the preference only when they start, so windows already open keep whichever menu they started with until their app is reopened. The tests run inside the app and quit it, so the app recognises a test run and never touches the preference during one.
 
 **Release integrity.** Automatic updates are protected by Sparkle, which refuses any build whose EdDSA signature does not verify against the key baked into the app. The manual download is protected by Apple: the DMG and the app inside it are signed with a Developer ID and notarized, with the ticket stapled, so Gatekeeper will not open one that was altered after it was built. No checksum is published on top of that. A workflow on the site checks every push that each appcast enclosure is HTTPS, signed, present in the repo and the length it claims, so a release that does not line up fails there instead of reaching users. On the build side, `release.sh` signs the appcast with the command-line tools from the same Sparkle package the app was built against, found by asking Xcode where this project's DerivedData is, and stops if their version differs from the one `Package.resolved` pins. WindowSmith is on Sparkle 2.10.1 from version 1.3.7.
 
