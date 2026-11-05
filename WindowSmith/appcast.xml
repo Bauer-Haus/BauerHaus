@@ -3,18 +3,38 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.3.10</title>
-            <pubDate>Tue, 03 Nov 2026 18:47:57 -0600</pubDate>
+            <title>1.4.0</title>
+            <pubDate>Thu, 05 Nov 2026 11:16:53 -0600</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>25</sparkle:version>
-            <sparkle:shortVersionString>1.3.10</sparkle:shortVersionString>
+            <sparkle:version>26</sparkle:version>
+            <sparkle:shortVersionString>1.4.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Fixed</h2>
+            <description><![CDATA[<h2>Snap to the screen's edges</h2>
 <ul>
-  <li>Drag to Snap no longer moves desktop widgets. Dragging a widget used to snap it into a layout zone without showing the blue preview first; widgets now stay exactly where you drop them. App windows snap just as before.</li>
+  <li>Drag to Snap has a new Screen edges mode. Drag a window into a corner for a quarter of the screen, against a side for half, to the top for the whole screen, or to the bottom for the third under the pointer. On a portrait screen, the sides give thirds and the bottom the lower half.</li>
+  <li>Guides along the screen's edges show where each zone is while you drag, and light up under the pointer.</li>
+  <li>Choose it in Settings &rarr; Mouse &rarr; Snap by. Layout mode works just as before. New installs start with drag to snap on, in Screen edges mode.</li>
+  <li>The menu now warns when macOS's own tiling is on, since it fights drag to snap, and links straight to the setting.</li>
+</ul>
+<h2>Center and Restore</h2>
+<ul>
+  <li>Center Window (&#x2303;&#x2325;C) moves the front window to the middle of the screen, keeping its size.</li>
+  <li>Restore Window (&#x2303;&#x2325;&#x232B;) puts a window back how it was before WindowSmith moved it. With drag to snap on, dragging a snapped window away does the same.</li>
+  <li>Both are also buttons in the menu, under Quick Snap.</li>
+</ul>
+<h2>Shortcuts and Settings</h2>
+<ul>
+  <li>WindowSmith's shortcuts now belong to it alone, so a press no longer also reaches the app in front.</li>
+  <li>Settings is now in four tabs: General, Shortcuts, Mouse and My Layouts. It reopens on the tab you last used.</li>
+  <li>After saving a layout, you can put it on a shortcut in one click.</li>
+  <li>If macOS takes away WindowSmith's Accessibility access, Settings says so and offers a fix.</li>
+</ul>
+<h2>Green button</h2>
+<ul>
+  <li>Quitting WindowSmith now gives Apple's green-button menu back, and opening it hides Apple's menu again.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.3.10.dmg" length="7289498" type="application/octet-stream" sparkle:edSignature="OUZS8ty2F6Xf1vmglcsNYl3tgz7y1eLXfZf9aoMUbOeN7YgObDf5xR1AfD5cvQQcRn5mOgj4dJ8dUWoKQCkxCg=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.4.0.dmg" length="7446683" type="application/octet-stream" sparkle:edSignature="ubbnmCBYj8kO9rZH7LgLGlOopsSF4en1tiGT9qcc7vlxVn6nYA3QGoXLqy41rEtRtJGkuMKIq5T7SoA4UZFDCw=="/>
         </item>
     </channel>
 </rss>
