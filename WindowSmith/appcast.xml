@@ -3,27 +3,20 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.4.1</title>
-            <pubDate>Fri, 06 Nov 2026 16:28:36 -0600</pubDate>
+            <title>1.4.2</title>
+            <pubDate>Wed, 11 Nov 2026 17:53:50 -0600</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>27</sparkle:version>
-            <sparkle:shortVersionString>1.4.1</sparkle:shortVersionString>
+            <sparkle:version>28</sparkle:version>
+            <sparkle:shortVersionString>1.4.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Snapping</h2>
+            <description><![CDATA[<h2>Edge guides</h2>
 <ul>
-  <li>Windows that slide into place, as some apps do while an accessibility tool like VoiceOver or Grammarly is running, now snap in one click. Before, a layout could take several clicks to arrive, a step at a time.</li>
-  <li>Every snap now checks that the window got where it was sent, and tries again if it didn't.</li>
-</ul>
-<h2>Updates</h2>
-<ul>
-  <li>Updates now install as soon as they've downloaded, while you're not using WindowSmith, instead of waiting for you to quit it. Before, a copy left running could keep offering an older update after a newer one was out.</li>
-</ul>
-<h2>Restore</h2>
-<ul>
-  <li>Restore now puts a window back where it was before you first dragged it to snap. Snapping it again by dragging no longer changes where Restore takes it.</li>
+  <li>The guides along the screen's edges now have a two-tone outline, a white line inside a dark one, so they're easy to see on light, dark and colorful backgrounds alike.</li>
+  <li>The guides in each corner are drawn as one piece, with no lines crossing where they meet.</li>
+  <li>With Increase contrast, Reduce transparency or Differentiate without color turned on in System Settings &rarr; Accessibility &rarr; Display, every guide is drawn solid and the one under the pointer gets a thicker white line.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.4.1.dmg" length="7450266" type="application/octet-stream" sparkle:edSignature="7IEII48ttaIZBDDbzMPxh5dMB+F/Oo5KiLCtTeMukBHyCorKvYEA2TFw4VvJLnOWXpRjdk/rxEA97OEVsQNmAg=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.4.2.dmg" length="7451802" type="application/octet-stream" sparkle:edSignature="0+fy7+N0lhhFHyssmGDu2SJBVDDTeJl/EZ2Wi+Eb/fYago4GncKxDoukIiw5fOZ+uhRl1dDJNrcrz+2wg56eCQ=="/>
         </item>
     </channel>
 </rss>
