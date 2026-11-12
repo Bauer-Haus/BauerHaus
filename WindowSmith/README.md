@@ -11,7 +11,7 @@ The Challenge: macOS offers a refined operating system, but its native window ma
 
 The Solution: WindowSmith is a highly optimized, keyboard-driven window manager and layout utility built natively for macOS. Designed for developers, designers, and multitaskers, it enables instant window snapping into precise grid layouts (Halves, Thirds, Quadrants, or Custom Grids whose cells can be grouped into larger zones), seamless cross-display window routing, and exact pixel-perfect sizing.
 
-Operating discreetly from the menu bar, WindowSmith is driven by customizable global hotkeys, by dragging a window onto a live zone preview, or by an optional Quick Snap palette on every window's green button. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
+Operating discreetly from the menu bar, WindowSmith is driven by customizable global hotkeys, by dragging a window to the screen's edges or onto a layout's zones, or by an optional Quick Snap palette on every window's green button. Center Window moves the front window to the middle of the screen, and Restore Window puts it back how it was before WindowSmith first moved it. Whether utilizing a rigid 25/50/25 "Focus" layout for development or a complex custom grid, WindowSmith provides unparalleled control over the macOS desktop environment.
 
 ## Technical Stack
 
@@ -35,7 +35,7 @@ ServiceManagement: Ensures seamless "Launch at Login" functionality.
 
 Combine: Facilitates reactive state management across the application lifecycle.
 
-Sparkle 2: Delivers automatic updates, each verified against an EdDSA signature before it installs.
+Sparkle 2: Delivers automatic updates, each verified against an EdDSA signature before it installs, and installed as soon as WindowSmith is idle rather than waiting for it to quit.
 
 ## Engineering Challenges & Solutions
 
@@ -55,7 +55,9 @@ Coordinate Normalization: The engine dynamically queries NSScreen.screens to map
 
 Inversion & Injection: Prior to injecting the new coordinates via AXUIElementSetAttributeValue, the engine intercepts the height of the primary screen and mathematically inverts the Y-axis.
 
-Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associated with resizing heavy applications (e.g., Xcode or web browsers), keyboard-triggered sizing and positioning commands are dispatched asynchronously on a background userInteractive queue. This utilizes a micro-sleep (usleep) buffer, allowing the target application's internal UI thread to synchronize before applying the final coordinate snap.
+Concurrency: To prevent the visual "stuttering" or "rubber-banding" often associated with resizing heavy applications (e.g., Xcode or web browsers), every move is dispatched asynchronously on a background userInteractive queue, so the menu, palette or drag preview never waits on the target application.
+
+Verified Moves: Every move goes through one routine that writes size, then position, then size again, so a window crossing to a differently sized display still gets its full size. It then reads the frame back and retries, for up to about half a second, until the window arrives or the application stops letting it move. Applications that animate their windows while an assistive tool is running (their AXEnhancedUserInterface setting) have that setting switched off for the move and restored afterwards, so the window lands in one step instead of partway.
 
 Result: A window manipulation engine that executes instantaneously and reliably, regardless of the target application or the complexity of the user's monitor configuration.
 
