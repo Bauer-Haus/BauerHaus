@@ -3,20 +3,19 @@
     <channel>
         <title>WindowSmith</title>
         <item>
-            <title>1.4.2</title>
-            <pubDate>Wed, 11 Nov 2026 17:53:50 -0600</pubDate>
+            <title>1.4.3</title>
+            <pubDate>Thu, 12 Nov 2026 13:40:12 -0600</pubDate>
             <link>https://bauerhaus.io/WindowSmith/</link>
-            <sparkle:version>28</sparkle:version>
-            <sparkle:shortVersionString>1.4.2</sparkle:shortVersionString>
+            <sparkle:version>29</sparkle:version>
+            <sparkle:shortVersionString>1.4.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Edge guides</h2>
+            <description><![CDATA[<h2>Accessibility access</h2>
 <ul>
-  <li>The guides along the screen's edges now have a two-tone outline, a white line inside a dark one, so they're easy to see on light, dark and colorful backgrounds alike.</li>
-  <li>The guides in each corner are drawn as one piece, with no lines crossing where they meet.</li>
-  <li>With Increase contrast, Reduce transparency or Differentiate without color turned on in System Settings &rarr; Accessibility &rarr; Display, every guide is drawn solid and the one under the pointer gets a thicker white line.</li>
+  <li>Grant Access now takes you straight to Accessibility in System Settings, without a second "would like to control this Mac" dialog on top of it. macOS's own prompt appears only the first time WindowSmith asks.</li>
+  <li>The menu's permission card has one button, Grant Access, in place of two that did the same thing.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.4.2.dmg" length="7451802" type="application/octet-stream" sparkle:edSignature="0+fy7+N0lhhFHyssmGDu2SJBVDDTeJl/EZ2Wi+Eb/fYago4GncKxDoukIiw5fOZ+uhRl1dDJNrcrz+2wg56eCQ=="/>
+            <enclosure url="https://bauerhaus.io/WindowSmith/downloads/WindowSmith-1.4.3.dmg" length="7450779" type="application/octet-stream" sparkle:edSignature="WZW+r+iMFMVdi0N9dbltS2nQfbPbrxEIOurTSIJo3lJ/oJ0L5ZujZLEgjpBg0tFLjQqOyuVVXeyK7t1sL4khAw=="/>
         </item>
     </channel>
 </rss>

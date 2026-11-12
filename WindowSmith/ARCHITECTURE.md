@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.4.2 (build 28).
+Reflects WindowSmith 1.4.3 (build 29).
 
 ```mermaid
 graph TD
@@ -164,6 +164,8 @@ graph TD
 **Primary-display coordinate anchoring.** AppKit measures from the bottom-left of the primary display; the Accessibility API measures from the top-left. Every conversion is anchored to the display whose origin is `(0,0)` rather than `NSScreen.main`, which follows the key window and therefore reports a different — and differently sized — screen whenever the target window sits on a secondary monitor.
 
 **Permission detection without polling the user.** A menu bar app never receives `didBecomeActive` when the user flips the Accessibility switch in System Settings, so trust changes arrive two ways: an observer on the `com.apple.accessibility.api` distributed notification, plus a 1-second timer that runs only while untrusted and invalidates itself on grant. The timer is scheduled in `.common` run loop mode so it keeps firing while the menu bar popover is open.
+
+**Asking for access.** Grant Access in the menu and Fix in Settings call `promptForPermissions`. The first time ever (no `hasPromptedForAccessibility` yet) it asks macOS through `AXIsProcessTrustedWithOptions` with the prompt option, which also puts WindowSmith in the Accessibility list. Every later time it opens that list in System Settings and nothing else. Recent macOS shows its "would like to control this Mac" prompt each time an untrusted app asks, not once per app, so before 1.4.3 a re-grant brought the prompt up on top of System Settings. Re-grants are routine during development: macOS treats a build from Xcode as a different app from the release, so switching between them needs Accessibility granted again. The menu's separate Open System Settings link did the same as Grant Access and was removed.
 
 **Shortcuts that belong to WindowSmith.** Since 1.4.0 the shortcuts are Carbon hot keys (`RegisterEventHotKey` with `kEventHotKeyExclusive`), not a global `NSEvent` monitor. A global monitor only listens: the key press still reached the app in front, so ⌃⌥1 could also type into it. A hot key is consumed, and it needs no Accessibility permission to be heard, so the grant no longer has to re-arm anything. Each action is registered by key code with `controlKey | optionKey` - 1-4 on both the number row and the keypad, the arrows, C and Delete - so the modifier and caps-lock clean-up the old monitor needed is gone. C is looked up through `UCKeyTranslate` in the keyboard layout in use, so Center follows the key marked C on any layout, and every key is registered again when the input source changes. If another app already holds a combination, registration fails for that key alone; an action counts as unavailable only if none of its keys could be had, and Settings marks it.
 
