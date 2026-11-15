@@ -3,21 +3,24 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.7</title>
-            <pubDate>Tue, 03 Nov 2026 20:17:53 -0600</pubDate>
+            <title>1.0.8</title>
+            <pubDate>Sun, 15 Nov 2026 07:22:28 -0600</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>10</sparkle:version>
-            <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.7</h2>
+            <description><![CDATA[<h2>Nexa 1.0.8</h2>
 <ul>
-  <li>The chat list keeps a sensible width: it opens wide enough to read names, and can no longer be dragged so wide that the chat gets squeezed and its buttons disappear into a "»" menu.</li>
-  <li>Showing the sidebar again no longer makes the window wider each time.</li>
-  <li>Nexa remembers its window size and chat list width after updates.</li>
-  <li>Fixed a rare crash in how chats are saved.</li>
+  <li>Privacy fix for Tor: while Tor was still connecting, a file download that resumed at launch, or a request to remove a file from its servers, could reach the file server directly instead of through Tor. Files now always wait for Tor. Messages were never affected.</li>
+  <li>Nexa notices when a relay connection has gone quiet (after changing Wi-Fi, say) and reconnects, so messages keep arriving.</li>
+  <li>A message is less likely to show "Not sent" when a relay was only slow to answer.</li>
+  <li>Fixed a crash when opening "What can this server see?" for a relay with an IPv6 address.</li>
+  <li>The window no longer pauses for a moment when a large file finishes downloading.</li>
+  <li>New default servers: one relay stopped accepting connections through Tor and one file server stopped accepting Nexa's uploads, so new chats start with replacements that were tested through Tor. Existing chats swap them on their own.</li>
+  <li>Updated the built-in Tor.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.7.dmg" length="28670419" type="application/octet-stream" sparkle:edSignature="KC/xb2ArEGAAx5el47UXibkdsrC5AuYVdOxNVaDr4NcHYynsO06KKcBYoqay4I3DXc53RcmT2HEC7Yix8XMsBQ=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.8.dmg" length="28556577" type="application/octet-stream" sparkle:edSignature="VfV5fvu2RLySDs40PFRzfMvkvbx2yw4QcDU4t9qGCP27onYzBF5Qepmwzo9TXoKTRaK5ZjkEbFN0tZF2vcGCBQ=="/>
         </item>
     </channel>
 </rss>
