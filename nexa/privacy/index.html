@@ -40,7 +40,7 @@
 
 <main class="wrap narrow policy">
     <h1 class="page">Nexa Privacy Policy</h1>
-    <p class="updated">Effective October 10, 2026 · Updated October 13, 2026 (update checks in the version downloaded from bauerhaus.io, and turning them off)</p>
+    <p class="updated">Effective October 10, 2026 · Updated November 17, 2026 (extra backup relays from a list we sign, from version 1.0.9)</p>
 
     <div class="notice">
         <p><strong>We have no way to read or save your data.</strong> Nexa has no servers of ours and no accounts, so nothing you send ever passes through us. Your messages, files and contacts are encrypted with keys that exist only on your Mac and the Macs of the people you talk to. We can't read them, store them, recover them or hand them over to anyone, because we never have them.</p>
@@ -68,6 +68,9 @@
 
     <h3>Nostr relays (messages)</h3>
     <p>Each message is end-to-end encrypted on your Mac and sent to public Nostr relays, which hold it until your contact's Mac (or, in a group, each member's Mac) picks it up. A relay sees only encrypted data of a padded size, the time it was sent, and a one-time address that changes with every message. It can't see your name (there are no accounts), who you are talking to, or what you said. In Standard mode it can see your IP address (see below). Nexa asks relays to delete messages after 14 days by default (you can change this), but relays are run by others and may keep the encrypted data longer. You can see and change which relays are used in Settings &rsaquo; Relays, including who operates each one. Group messages go to the relays of the person who made the group, and look exactly like private messages to the relay.</p>
+
+    <h3>Extra backup relays (from version 1.0.9)</h3>
+    <p>Nexa replaces a relay or file server that stops working with a tested backup. Most backups are built into the app; more can come from a list we sign, so they reach you without an app update. In Maximum privacy mode (or with your own proxy), Nexa asks the relays it already uses for that list about once a day, through Tor, with a request that is the same for everyone and says nothing about you or your chats. Nexa uses a server from the list only when none of the built-in backups work, and then at most one relay and one file server from it. Such a server can see exactly what any other relay or file server can see, as described above, and never your IP address: in Standard mode Nexa doesn't ask for the list or use servers from it. Settings &rsaquo; Relays marks a server that came from the list and shows who runs it. We choose the servers on the list, but we don't run them and they don't report anything to us.</p>
 
     <h3>File servers (attachments)</h3>
     <p>Files you send are encrypted on your Mac and uploaded in pieces to public Blossom file servers, then downloaded by your contact. The servers see only encrypted pieces of a padded size. Nexa asks the servers to delete them once they are delivered. In a group, a file stays on the servers until it expires, because other members may not have downloaded it yet; the sender's Nexa then asks for it to be deleted.</p>
