@@ -3,20 +3,19 @@
     <channel>
         <title>Nexa</title>
         <item>
-            <title>1.0.9</title>
-            <pubDate>Mon, 16 Nov 2026 15:42:23 -0600</pubDate>
+            <title>1.0.10</title>
+            <pubDate>Tue, 17 Nov 2026 07:38:25 -0600</pubDate>
             <link>https://bauerhaus.io/nexa/</link>
-            <sparkle:version>12</sparkle:version>
-            <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>1.0.10</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nexa 1.0.9</h2>
+            <description><![CDATA[<h2>Nexa 1.0.10</h2>
 <ul>
-  <li>Backup relays can now reach Nexa without an app update. When a relay stops working and none of the built-in backups work either, Nexa can use one from a list signed by Nexa's developer. This only happens with Tor or a proxy on, so that relay never sees your IP address, and Nexa uses at most one such relay at a time. Settings shows which relay came from the list and who runs it. To get the list, Nexa asks its relays for it once a day, through Tor or your proxy only; the request says nothing about you.</li>
-  <li>When a relay stops working, each Mac now picks its replacement in its own order, so not everyone moves to the same backup at once.</li>
-  <li>Security update for the Go code in the built-in Tor's bridge transports.</li>
+  <li>Privacy fix for the extra backup relays added in 1.0.9: after switching from Maximum privacy to Standard, Nexa could still have connected directly to a relay from Nexa's signed list for up to two weeks. Now nothing ever connects to a server from the list without Tor or a proxy. No list had been published yet, so nobody was affected.</li>
+  <li>Updated the built-in Tor bridges from the Tor Project's current list.</li>
 </ul>
 ]]></description>
-            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.9.dmg" length="28625718" type="application/octet-stream" sparkle:edSignature="RImMAVP99/x0QZ1wBrp67RWOyZnJ+89TK241Ye9Kq8d66TMN3Q3JhfKdBHfwBmSWpcU2AIvptHmkofHyZCO0AQ=="/>
+            <enclosure url="https://bauerhaus.io/nexa/downloads/Nexa-1.0.10.dmg" length="28660353" type="application/octet-stream" sparkle:edSignature="KWFIoirCpdDIHTFcb27f+2AbS+rbZy4q9KNx32FnCChVYAR78raQGzTV+ogyd6A2UWqzAvc8GGsZRzkB1kLiBg=="/>
         </item>
     </channel>
 </rss>
