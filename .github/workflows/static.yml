@@ -26,7 +26,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +35,19 @@ jobs:
           # This job only reads the tree and uploads it; leaving the token in
           # .git/config would let any later step push with it.
           persist-credentials: false
+      - name: Check site size
+        # GitHub Pages refuses to publish a site over 1 GB, and every release
+        # adds its DMG here. Warn early so old downloads can be moved out
+        # before a deploy fails outright.
+        run: |
+          size_mb=$(du -sm --exclude=.git --exclude=.github . | cut -f1)
+          echo "Site size: ${size_mb} MB of the 1024 MB GitHub Pages limit."
+          if [ "$size_mb" -ge 1000 ]; then
+            echo "::error::Site is ${size_mb} MB; GitHub Pages will reject anything over 1 GB."
+            exit 1
+          elif [ "$size_mb" -ge 800 ]; then
+            echo "::warning::Site is ${size_mb} MB, close to the 1 GB GitHub Pages limit. Move old DMGs out soon."
+          fi
       - name: Setup Pages
         uses: actions/configure-pages@v6
       - name: Upload artifact
@@ -48,4 +61,15 @@ jobs:
           path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
+        # GitHub sometimes can't see an artifact for a moment after it's
+        # uploaded ("No artifacts named github-pages were found"), which
+        # failed run #179. Let this attempt fail softly and try once more.
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - name: Wait before retrying the deploy
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - name: Deploy to GitHub Pages (retry)
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
