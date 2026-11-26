@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.4.3 (build 29).
+Reflects WindowSmith 1.4.4 (build 30).
 
 ```mermaid
 graph TD
@@ -40,9 +40,10 @@ graph TD
         HK["HotKeys<br/>Carbon RegisterEventHotKey · exclusive"]
         UPD["UpdaterController<br/>wraps SPUStandardUpdaterController · automatic-check switch · relaunch watcher"]
         RM["RestoreMemory<br/>each window's frame before WindowSmith moved it"]
+        DP["DockPresence<br/>in the Dock only while Settings or an update check is up"]
 
         subgraph WC_Logic ["WindowController Internals"]
-            Geo["Geometry Engine<br/>relative rects · throw"]
+            Geo["Keyboard Moves<br/>KeyboardMove · target worked out on the move queue"]
             Perm["Permission Watch<br/>trust notification + 1s poll"]
             Cycle["Cycle State<br/>5s arrow-key timeout"]
         end
@@ -65,7 +66,7 @@ graph TD
         CGW["CGWindowList<br/>answered by the WindowServer"]
         WS["NSWorkspace<br/>frontmost app · wake"]
         CG["NSScreen / CoreGraphics<br/>display bounds"]
-        GCD["Grand Central Dispatch<br/>userInteractive queue"]
+        GCD["Grand Central Dispatch<br/>serial window-move queue"]
         SM["SMAppService<br/>Launch at Login"]
         DNC["DistributedNotificationCenter<br/>com.apple.accessibility.api"]
         OSL["OSLog"]
@@ -92,6 +93,8 @@ graph TD
     WC <-->|Combine @Published Updates| MenuBarView
     WC <-->|Persists / Loads| UD
     WC -->|Toggles| SM
+    SWM -->|Settings open / closed| DP
+    UPD -->|Update check started / finished| DP
 
     %% Core internals
     CEV == "Ctrl+Opt 1-4 · arrows · C · Delete" ==> HK
@@ -134,7 +137,7 @@ graph TD
     Grid -->|Draws the same blocks| LM
 
     %% One placement calculation for every consumer
-    Geo -->|Zone rects · size presets · arrow-key wrap| MATH
+    Geo -->|Zone rects · size presets · arrow-key wrap · display order| MATH
     DSM -->|Zone under the cursor · near-edge test| MATH
 
     %% Green-button palette
@@ -153,7 +156,7 @@ graph TD
 
     %% Assign Classes
     class App,MenuBarView,Overlay,SWM,SettingsView,Snap,Cell,Grid,Preview,Guides,Palette ui;
-    class WC,HK,UPD,RM,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,ES,AT,WL,LM,MATH,ZPM,ZPS core;
+    class WC,HK,UPD,RM,DP,Geo,Perm,Cycle,UD,WC_Logic,DSM,DSS,ES,AT,WL,LM,MATH,ZPM,ZPS core;
     class AX,WS,CG,GCD,SM,DNC,OSL,CGW,GP,WMP,CEV sys;
     class SPK,Feed net;
     class TA target;
@@ -193,9 +196,9 @@ graph TD
 
 **Restore.** `RestoreMemory` keeps, for each window WindowSmith moves, the frame it had before WindowSmith first touched it, matched by `CFEqual` on the `AXUIElement` and capped at 64 windows. Moving an already-moved window again keeps that first frame, provided the window is still where WindowSmith put it; if the user has moved it since, the new starting point replaces it. Restore Window (⌃⌥⌫ or the menu) puts the front window back and forgets it. With drag to snap on, dragging a snapped window away does the same for its size: once the drag is confirmed the window takes its original size back, keeping the grab point under the pointer, in proportion across the width and at the same distance from the top. A drag snap counts its move from the frame the window had at mouse-down, since by the drop the window has already moved. The original is kept through the drag: dropped into another snap, the move continues from where WindowSmith last put the window, so Restore still goes back to before the first snap; set down anywhere else, the window is forgotten at the drop. Before 1.4.1 the original was forgotten as soon as the drag pulled the window loose, and the drop counted from where it was let go, so Restore after two drag snaps went to the drop point. The record lives only in memory, since a window's identity does not outlast the app that owns it.
 
-**Center.** Center Window (⌃⌥C or the menu) moves the front window to the middle of its screen's visible frame without resizing it, through `SnapMath.centredOrigin`, rounded to whole points; a window larger than the visible frame starts at its top-left corner instead. It is recorded like any other move, so Restore undoes it.
+**Center.** Center Window (⌃⌥C or the menu) is a keyboard move like a snap, and moves the front window to the middle of its screen's visible frame without resizing it, through `SnapMath.centredOrigin`, rounded to whole points; a window larger than the visible frame starts at its top-left corner instead. It is recorded like any other move, so Restore undoes it.
 
-**One placement calculation.** Hotkey snaps, arrow-key cycling, size presets and drag-to-snap all take their arithmetic from `SnapMath`: a zone's relative rect placed in a screen's visible frame, the zone under a dragged cursor, the next zone in a cycle, a size preset centred and held between 100 and 10,000 points. Hotkey snaps and drag-to-snap used to carry separate copies of the placement math, kept in step by hand; one copy means a dropped window and a hotkey-snapped window cannot land a pixel apart. Each edge is rounded to a whole point on its own, so two zones that share a divider share its pixel. The functions take plain rects rather than an `NSScreen` or a window, which is what lets the unit tests check every layout on real display sizes - uneven widths, a display at negative coordinates, a portrait display - for gaps, overlaps and dead spots without moving a window or touching the presets saved in UserDefaults.
+**One placement calculation.** Hotkey snaps, arrow-key cycling, size presets, moving to another display and drag-to-snap all take their arithmetic from `SnapMath`: a zone's relative rect placed in a screen's visible frame, the zone under a dragged cursor, the next zone in a cycle, a size preset centred and held between 100 and 10,000 points, the display a window is on and the one beside it. Hotkey snaps and drag-to-snap used to carry separate copies of the placement math, kept in step by hand; one copy means a dropped window and a hotkey-snapped window cannot land a pixel apart. Each edge is rounded to a whole point on its own, so two zones that share a divider share its pixel. The functions take plain rects rather than an `NSScreen` or a window, which is what lets the unit tests check every layout on real display sizes - uneven widths, a display at negative coordinates, a portrait display - for gaps, overlaps and dead spots without moving a window or touching the presets saved in UserDefaults.
 
 **Finding the green button without watching every window.** The palette opens when the pointer rests on another app's green button, so it watches mouse movement - the one feature that does - and nearly all of that work is avoided outright. Every on-screen window's button corner, the top-left 100×70pt where traffic lights can sit under a tall unified toolbar, is fetched from the WindowServer and kept. Those corners cover around a percent of the screen, so almost every movement falls outside all of them and is dismissed with a few comparisons, without asking anyone anything. They are refetched at most once a second while the pointer moves, and marked stale after a click, an app switch, a Space change, or the palette itself moving a window, since that is when windows usually move. The price is that a window moved without the mouse - by a keyboard shortcut, a hotkey, an app resizing itself - can be missed for up to that second. Measured, this took the cost while the pointer moves from about 0.56% of a core to about 0.05%.
 
@@ -213,6 +216,12 @@ Inside a saved corner the checks run from cheap to costly. The WindowServer name
 
 **Installing updates promptly.** With automatic updates on, Sparkle downloads an update in the background and normally holds it until the app quits. While it waits, every check, Check for Updates included, offers that same update again without reading the feed, and the scheduled checks stop too. A menu bar app that launches at login can go weeks without quitting, so a 1.3.8 copy holding 1.3.9 kept offering 1.3.9 after 1.4.0 was out. Since 1.4.1 the updater delegate takes the install over (`updater(_:willInstallUpdateOnQuit:immediateInstallationBlock:)` returns `true`) and runs Sparkle's install-and-relaunch at the first quiet moment: no mouse button held, which may be a drag being snapped, and none of WindowSmith's titled windows open, such as Settings or an update panel. Otherwise it looks again every 30 seconds. The relaunch goes through the same delegate call as any other, so Apple's green-button menu stays hidden across it.
 
-**Asynchronous injection.** Every move - keyboard snaps, size presets, the green-button palette, drag to snap, Center and Restore - goes through `WindowMove`, off the main thread. Keyboard snaps and size presets run on a background `userInteractive` queue; drag to snap, the palette, Center and Restore already hold the exact window, so they run on a serial background queue, one move at a time. The palette or drag preview leaves the screen the moment a zone is chosen instead of waiting on the app, and the app is given up to a second to answer. The element arrives carrying the 0.1s limit the hover check set, which a busy Xcode or Electron app could miss, leaving the window where it was.
+**Asynchronous injection.** Every move - keyboard snaps, size presets, Center, moving to another display, the green-button palette, drag to snap and Restore - goes through `WindowMove` on one serial background queue, one move at a time. The keyboard path (`moveFrontWindow`) reads the displays on the main thread and hands them over as plain rects (`ScreenGeometry`); everything that talks to the app happens on the queue: finding the front window, reading its frame, working out the target (`WindowController.target(for:)`, pure and unit-tested), moving it, and reading it back for Restore. A hung app therefore costs the queue a second, never the main thread, and two quick presses run strictly in turn, the second starting from where the first left the window. Before 1.4.4 the keyboard path looked the window up on the main thread and moved it on a concurrent queue, so two presses of ⌃⌥→ on an app that slides its windows could move one window at once, toggle `AXEnhancedUserInterface` against each other, and hand Restore a half-finished frame as the original. The palette or drag preview leaves the screen the moment a zone is chosen instead of waiting on the app, and the app is given up to a second to answer.
+
+**One app-wide time limit.** `AXUIElementSetMessagingTimeout` on the system-wide element sets the limit for every Accessibility call in the process that has no limit of its own, and finding the element under the pointer can only be limited that way. Drag to snap sets it to 0.25s on every click and the green-button check to 0.1s on every hover, so it changes all the time. Anything that moves a window therefore carries its own: `WindowLookup.focusedWindow` gives the app and the window it answers with 1s (`moveTimeout`), and the palette and drag paths set 1s on the element they already hold. Before 1.4.4 the keyboard path had none, so after a hover a shortcut aimed at a busy Xcode or Electron app could run out of time and leave the window where it was.
+
+**Moving to another display.** ⌃⌥← and ⌃⌥→, outside a zone cycle, send the front window to the display beside it, keeping its place and size as fractions of the usable screen. Displays are taken left to right by their left edges, top to bottom where two share one, and the ends wrap round (`SnapMath.neighbourScreenIndex`). `NSScreen.screens` promises nothing about order beyond the primary display coming first, so before 1.4.4 following it could skip past the display beside the window once three were connected.
+
+**In the Dock only when needed.** WindowSmith is an agent app (`LSUIElement`), but its own windows - Settings and Sparkle's update panels - cannot come forward unless it is a regular app while they are up. `DockPresence` keeps two flags, Settings open and an update check under way, and is a regular app while either is set. Settings sets its flag on open and clears it on close; Check for Updates sets the other, and Sparkle's `standardUserDriverWillFinishUpdateSession` clears it when the check ends. Before 1.4.4 only closing Settings went back to the agent policy, so Check for Updates from the menu left a Dock icon behind, and closing Settings mid-check sent Sparkle's panel behind other apps.
 
 **Moves that arrive.** `WindowMove` writes size, then position, then size again, so an app that shrinks a window to fit the screen it is leaving gets the full size once the window is on the new one. It then reads the frame back and sends it again until the window is within 10pt of the target, the window stops moving between tries (a minimum size or a frame the app insists on), or five tries have gone by: the first is checked after 10ms and the rest after 100ms, so a window that never arrives is let go within about half a second. Apps with `AXEnhancedUserInterface` on, which they switch on for assistive tools such as VoiceOver or Grammarly, slide a window to its new frame, and a write sent mid-slide lands partway. Before 1.4.1 a layout could take ten clicks to arrive that way, a step at a time. `WindowMove` switches the setting off on the app for the move and puts it back afterwards, as Rectangle and Magnet do.
