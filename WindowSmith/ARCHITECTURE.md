@@ -1,6 +1,6 @@
 # WindowSmith Architecture
 
-Reflects WindowSmith 1.4.4 (build 30).
+Reflects WindowSmith 1.5.0 (build 30).
 
 ```mermaid
 graph TD
@@ -45,7 +45,7 @@ graph TD
         subgraph WC_Logic ["WindowController Internals"]
             Geo["Keyboard Moves<br/>KeyboardMove · target worked out on the move queue"]
             Perm["Permission Watch<br/>trust notification + 1s poll"]
-            Cycle["Cycle State<br/>5s arrow-key timeout"]
+            Cycle["Cycle State<br/>5s arrow-key timeout · last layout snap"]
         end
 
         DSM["DragSnapMonitor<br/>global mouse monitors · drag detection"]
@@ -97,7 +97,7 @@ graph TD
     UPD -->|Update check started / finished| DP
 
     %% Core internals
-    CEV == "Ctrl+Opt 1-4 · arrows · C · Delete" ==> HK
+    CEV == "Chosen modifiers, Ctrl+Opt by default · 1-4 · arrows · C · Delete" ==> HK
     HK == "Layout · cycle / throw · center · restore" ==> WC
     WC -->|Frame before and after each move| RM
     WC --> Geo
@@ -170,7 +170,11 @@ graph TD
 
 **Asking for access.** Grant Access in the menu and Fix in Settings call `promptForPermissions`. The first time ever (no `hasPromptedForAccessibility` yet) it asks macOS through `AXIsProcessTrustedWithOptions` with the prompt option, which also puts WindowSmith in the Accessibility list. Every later time it opens that list in System Settings and nothing else. Recent macOS shows its "would like to control this Mac" prompt each time an untrusted app asks, not once per app, so before 1.4.3 a re-grant brought the prompt up on top of System Settings. Re-grants are routine during development: macOS treats a build from Xcode as a different app from the release, so switching between them needs Accessibility granted again. The menu's separate Open System Settings link did the same as Grant Access and was removed.
 
-**Shortcuts that belong to WindowSmith.** Since 1.4.0 the shortcuts are Carbon hot keys (`RegisterEventHotKey` with `kEventHotKeyExclusive`), not a global `NSEvent` monitor. A global monitor only listens: the key press still reached the app in front, so ⌃⌥1 could also type into it. A hot key is consumed, and it needs no Accessibility permission to be heard, so the grant no longer has to re-arm anything. Each action is registered by key code with `controlKey | optionKey` - 1-4 on both the number row and the keypad, the arrows, C and Delete - so the modifier and caps-lock clean-up the old monitor needed is gone. C is looked up through `UCKeyTranslate` in the keyboard layout in use, so Center follows the key marked C on any layout, and every key is registered again when the input source changes. If another app already holds a combination, registration fails for that key alone; an action counts as unavailable only if none of its keys could be had, and Settings marks it.
+**Shortcuts that belong to WindowSmith.** Since 1.4.0 the shortcuts are Carbon hot keys (`RegisterEventHotKey` with `kEventHotKeyExclusive`), not a global `NSEvent` monitor. A global monitor only listens: the key press still reached the app in front, so ⌃⌥1 could also type into it. A hot key is consumed, and it needs no Accessibility permission to be heard, so the grant no longer has to re-arm anything. Each action is registered by key code with the chosen modifier mask - 1-4 on both the number row and the keypad, the arrows, C and Delete - so the modifier and caps-lock clean-up the old monitor needed is gone. C is looked up through `UCKeyTranslate` in the keyboard layout in use, so Center follows the key marked C on any layout, and every key is registered again when the input source changes. If another app already holds a combination, registration fails for that key alone; an action counts as unavailable only if none of its keys could be had, and Settings marks it.
+
+**One set of modifier keys.** Since 1.5.0 Settings › Shortcuts offers four modifier sets for every shortcut at once - ⌃⌥, ⌃⌥⌘, ⌃⌥⇧ and ⌃⌘ (`ShortcutModifiers`) - rather than a recorder per action, so the keys stay one set that's easy to remember and only what is held changes. ⌃⌥ is the default and what every earlier version used; the choice is written to `shortcutModifiers` only when someone picks another, and a missing or unrecognised value reads as ⌃⌥, so upgrading changes nobody's shortcuts. Which layout sits on each of 1-4 is stored by slot in `hotkeyAssignments` and is independent of the modifiers. ⌥⌘ is left out because ⌥⌘← and ⌥⌘→ switch tabs in Safari, Chrome and Xcode, and an exclusive hot key would take that from them. Changing the choice registers every shortcut again at once, so the "In use by another app" marks are worked out for the new combination straight away; every label in Settings is written from the same choice (`ShortcutText`).
+
+**Pressing a layout again.** A layout's shortcut sends the front window to the layout's first zone, or, if the window already fills one of its zones, to the next one, wrapping round - so ⌃⌥1 twice with Split puts a window left, then right. It goes by where the window is, not by a timer: snap one window, click another and press the same shortcut, and the second still starts at the first zone. A window fills a zone when every edge is within 10pt of it (`SnapMath.zoneIndex(filledBy:)`), which leaves out a maximised window that merely shares the first zone's corner and allows for Terminal rounding to whole lines. An app that keeps a window bigger than its zone, at a minimum size, would fill no zone by that test, so the main thread also keeps `LayoutSnap`: the last window a layout move placed, the layout's zones, the zone, and the frame it landed at. The move counts the window as in that zone only if it is the same window (`CFEqual`), for the same layout, still where it landed. ⌃⌥← and ⌃⌥→ during the 5-second cycle step from the zone the window is in by the same rules, and fall back to the count kept on the main thread only for a window in no zone. Both are worked out on the window-move queue (`KeyboardMove.layoutPress` and `.layoutStep`), so a quick press and arrow always step on from where the previous move actually left the window.
 
 **Two disagreeing answers to "where is this window".** A title-bar drag is carried out by the WindowServer, not by the application — which is why a hung app's window can still be dragged. The Accessibility API asks the *owning application* for its position, so during a drag it returns a stale value and then jumps, measured at roughly 105ms behind the cursor across repeated drags. `CGWindowList` asks the WindowServer instead and tracks the cursor essentially 1:1. Drag detection therefore reads the WindowServer, which also cannot be stalled by an unresponsive app the way synchronous Accessibility IPC into that app's run loop can. The two sources are checked for agreement at mouse-down, and detection falls back to Accessibility if they disagree, so a mismatch can never move the wrong window.
 
